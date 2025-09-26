@@ -1,0 +1,270 @@
+{
+    "status": "success",
+    "results": 13,
+    "data": {
+        "categories": [
+            {
+                "_id": "6824dcc594cfe375bf50cfbc",
+                "name": "Textbooks & Supplies",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747248502/marketplace/pkepazfqosoblr1wgtsq.jpg",
+                "subcategories": [
+                    "Textbooks",
+                    "Notebooks",
+                    "Stationery",
+                    "Art Supplies"
+                ],
+                "createdAt": "2025-05-14T18:11:17.878Z",
+                "updatedAt": "2025-05-14T18:11:17.878Z",
+                "__v": 0,
+                "id": "6824dcc594cfe375bf50cfbc"
+            },
+            {
+                "_id": "68268360496ee29f9124e186",
+                "name": "Supermarket",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747354463/marketplace/qqdib7byizcbjrui963n.jpg",
+                "subcategories": [
+                    "Food Staples",
+                    "Snacks & Confectionery",
+                    "Beverages",
+                    "Breakfast Items",
+                    "Canned & Packaged Foods",
+                    "Cleaning Supplies",
+                    "Personal Care",
+                    "Household Essentials"
+                ],
+                "createdAt": "2025-05-16T00:14:24.709Z",
+                "updatedAt": "2025-05-16T00:14:24.709Z",
+                "__v": 0,
+                "id": "68268360496ee29f9124e186"
+            },
+            {
+                "_id": "682684d3496ee29f9124e18a",
+                "name": "Phones & Tablets",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747354834/marketplace/aqz2z5jhvujpmrxe99lj.jpg",
+                "subcategories": [
+                    "Smartphones",
+                    "Feature Phones",
+                    "Tablets",
+                    "Smartwatches",
+                    "Phone Accessories",
+                    "Power Banks",
+                    "Headphones & Earphones",
+                    "Wearables"
+                ],
+                "createdAt": "2025-05-16T00:20:35.281Z",
+                "updatedAt": "2025-05-16T00:20:35.281Z",
+                "__v": 0,
+                "id": "682684d3496ee29f9124e18a"
+            },
+            {
+                "_id": "682685b3496ee29f9124e18e",
+                "name": "Health & Beauty",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747355058/marketplace/whi70qinxkdtqkk7qw6o.jpg",
+                "subcategories": [
+                    "Skincare",
+                    "Haircare",
+                    "Oral Care",
+                    "Makeup",
+                    "Fragrances",
+                    "Supplements & Vitamins",
+                    "Medical Supplies",
+                    "Feminine Care"
+                ],
+                "createdAt": "2025-05-16T00:24:19.368Z",
+                "updatedAt": "2025-05-16T00:24:19.368Z",
+                "__v": 0,
+                "id": "682685b3496ee29f9124e18e"
+            },
+            {
+                "_id": "682686bd496ee29f9124e192",
+                "name": "Home & Office",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747355324/marketplace/samo0mzxgcqtijkt0yqb.jpg",
+                "subcategories": [
+                    "Furniture",
+                    "Office Supplies",
+                    "Lighting",
+                    "Decor",
+                    "Kitchenware",
+                    "Storage",
+                    "Cleaning Tools",
+                    "Smart Home Devices"
+                ],
+                "createdAt": "2025-05-16T00:28:45.286Z",
+                "updatedAt": "2025-05-16T00:28:45.286Z",
+                "__v": 0,
+                "id": "682686bd496ee29f9124e192"
+            },
+            {
+                "_id": "682687ab496ee29f9124e196",
+                "name": "Appliances",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747355562/marketplace/iegt31oebog7nvthvyof.jpg",
+                "subcategories": [
+                    "Large Appliances",
+                    "Small Appliances",
+                    "Air Conditioners & Fans",
+                    "Heaters",
+                    "Water Dispensers & Purifiers",
+                    "Electric Cookers & Gas Cookers",
+                    "Inverters & Stabilizers"
+                ],
+                "createdAt": "2025-05-16T00:32:43.335Z",
+                "updatedAt": "2025-05-16T00:32:43.335Z",
+                "__v": 0,
+                "id": "682687ab496ee29f9124e196"
+            },
+            {
+                "_id": "68268861496ee29f9124e19a",
+                "name": "Electronics",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747355744/marketplace/pwtmbqyxpmwqkkdlb7le.jpg",
+                "subcategories": [
+                    "Audio Systems",
+                    "DVD Players",
+                    "Projectors",
+                    "Car Electronics",
+                    "GPS & Navigation Devices"
+                ],
+                "createdAt": "2025-05-16T00:35:45.140Z",
+                "updatedAt": "2025-05-16T00:35:45.140Z",
+                "__v": 0,
+                "id": "68268861496ee29f9124e19a"
+            },
+            {
+                "_id": "6826898a496ee29f9124e19e",
+                "name": "Computing",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747356041/marketplace/tb0w2hyy0jsjzhazvxzx.jpg",
+                "subcategories": [
+                    "Laptops & Desktops",
+                    "Keyboards & Mice",
+                    "Storage Devices",
+                    "Printers & Scanners",
+                    "Computer Accessories",
+                    "Networking",
+                    "Computer Accessories",
+                    "Software"
+                ],
+                "createdAt": "2025-05-16T00:40:42.037Z",
+                "updatedAt": "2025-05-16T00:40:42.037Z",
+                "__v": 0,
+                "id": "6826898a496ee29f9124e19e"
+            },
+            {
+                "_id": "68268ae8496ee29f9124e1ad",
+                "name": "Fashion",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747356392/marketplace/rozmgndp7fkb8flcfy9p.jpg",
+                "subcategories": [
+                    "T-Shirts, Shirts, Jeans",
+                    "Suits & Blazers",
+                    "Shoes",
+                    "Accessories",
+                    "Underwear",
+                    "Dresses, Tops, Skirts",
+                    "Heels, Flats",
+                    "Handbags & Purses",
+                    "Jewelry",
+                    "Hijabs & Scarves",
+                    "Lingerie",
+                    "School Uniforms"
+                ],
+                "createdAt": "2025-05-16T00:46:32.863Z",
+                "updatedAt": "2025-05-16T00:46:32.863Z",
+                "__v": 0,
+                "id": "68268ae8496ee29f9124e1ad"
+            },
+            {
+                "_id": "68268baf496ee29f9124e1b1",
+                "name": "Sporting Goods",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747356590/marketplace/hpknacki2x2dmmujuomx.jpg",
+                "subcategories": [
+                    "Fitness Equipment",
+                    "Sportswear",
+                    "Outdoor Gear",
+                    "Balls",
+                    "Bicycles & Accessories",
+                    "Swimming Gear",
+                    "Supplements"
+                ],
+                "createdAt": "2025-05-16T00:49:51.159Z",
+                "updatedAt": "2025-05-16T00:49:51.159Z",
+                "__v": 0,
+                "id": "68268baf496ee29f9124e1b1"
+            },
+            {
+                "_id": "68268c89496ee29f9124e1b5",
+                "name": "Baby Products",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747356809/marketplace/d9i8ugerrg0jzsh5suim.jpg",
+                "subcategories": [
+                    "Diapers & Wipes",
+                    "Baby Food & Formula",
+                    "Feeding Bottles & Accessories",
+                    "Baby Skincare & Health",
+                    "Strollers & Carriers",
+                    "Toys & Learning Aids",
+                    "Cribs & Bedding",
+                    "Baby Clothing"
+                ],
+                "createdAt": "2025-05-16T00:53:29.948Z",
+                "updatedAt": "2025-05-16T00:53:29.948Z",
+                "__v": 0,
+                "id": "68268c89496ee29f9124e1b5"
+            },
+            {
+                "_id": "68268d59496ee29f9124e1b9",
+                "name": "Gaming",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747357016/marketplace/wz4bvx388equ2iym9clu.jpg",
+                "subcategories": [
+                    "Gaming Consoles",
+                    "PC Gaming",
+                    "Games",
+                    "Virtual Reality",
+                    "Gaming Chairs",
+                    "Game Merchandise"
+                ],
+                "createdAt": "2025-05-16T00:56:57.036Z",
+                "updatedAt": "2025-05-16T00:56:57.036Z",
+                "__v": 0,
+                "id": "68268d59496ee29f9124e1b9"
+            },
+            {
+                "_id": "68268fee496ee29f9124e1bf",
+                "name": "Automobiles",
+                "image": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747357676/marketplace/nu88vpxfacuqrwx2cai6.jpg",
+                "subcategories": [
+                    "Cars",
+                    "Tricycles",
+                    "Buses & Vans",
+                    "Electric Vehicles",
+                    "Engine & Mechanical Parts",
+                    "Body & Exterior",
+                    "Suspension & Brakes",
+                    "Exhaust & Emission",
+                    "Car Batteries",
+                    "Tires & Rims",
+                    "Interior Accessories",
+                    "Electronics",
+                    "Engine Oil",
+                    "Transmission Fluid",
+                    "Coolant & Radiator Fluid",
+                    "Brake Fluid",
+                    "Additives & Cleaners",
+                    "Car Wash Tools",
+                    "Wax & Polish",
+                    "Air Fresheners",
+                    "Vacuum Cleaners",
+                    "Car Alarms & Trackers",
+                    "Fire Extinguishers",
+                    "Emergency Kits",
+                    "Warning Triangles",
+                    "First Aid Kits",
+                    "Vehicle Insurance",
+                    "Vehicle Inspection",
+                    "Spare Part Installation",
+                    "Vehicle Towing"
+                ],
+                "createdAt": "2025-05-16T01:07:58.029Z",
+                "updatedAt": "2025-05-16T01:07:58.029Z",
+                "__v": 0,
+                "id": "68268fee496ee29f9124e1bf"
+            }
+        ]
+    }
+}

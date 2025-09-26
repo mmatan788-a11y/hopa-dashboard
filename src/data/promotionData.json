@@ -1,0 +1,28 @@
+{
+    "status": "success",
+    "results": 1,
+    "data": {
+        "promotionPlans": [
+            {
+                "features": {
+                    "priorityListing": false,
+                    "featuredProduct": false,
+                    "enhancedVisibility": false,
+                    "analyticsAccess": false,
+                    "customBadge": false
+                },
+                "_id": "6824e926e05eaff7ca8011e7",
+                "type": "premium",
+                "name": "Premium Plan",
+                "description": "High visibility for 14 days",
+                "duration": 14,
+                "price": 1000,
+                "isActive": true,
+                "createdAt": "2025-05-14T19:04:06.012Z",
+                "updatedAt": "2025-05-14T19:04:06.012Z",
+                "__v": 0,
+                "id": "6824e926e05eaff7ca8011e7"
+            }
+        ]
+    }
+}

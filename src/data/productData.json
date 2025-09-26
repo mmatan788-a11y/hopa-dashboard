@@ -1,0 +1,421 @@
+{
+    "status": "success",
+    "results": 9,
+    "data": {
+        "products": [
+            {
+                "promotionPlan": {
+                    "features": {
+                        "priorityListing": false,
+                        "featuredProduct": false,
+                        "enhancedVisibility": false,
+                        "analyticsAccess": false,
+                        "customBadge": false
+                    },
+                    "type": "free",
+                    "price": 0,
+                    "isNotified": false,
+                    "isExpired": false,
+                    "startDate": "2025-05-16T09:08:24.592Z"
+                },
+                "_id": "68270088d15cd5f1faebad27",
+                "name": "Premium Facial Care Set",
+                "price": 100,
+                "discount": null,
+                "description": "Complete skincare set with cleanser, toner, moisturizer, serum, and face masks for all skin types",
+                "images": [
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747386500/marketplace/yupuh7momgooscs604c0.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747386506/marketplace/pib3djvef1a6p2rehj2b.jpg"
+                ],
+                "categoryId": "682685b3496ee29f9124e18e",
+                "subcategory": "Skincare",
+                "owner": {
+                    "_id": "6824dc2494cfe375bf50cfaf",
+                    "username": "hydi Eghan",
+                    "profilePicture": "",
+                    "id": "6824dc2494cfe375bf50cfaf"
+                },
+                "views": 9,
+                "rating": 0,
+                "numReviews": 0,
+                "condition": "new",
+                "tags": [],
+                "reviews": [],
+                "dateUploaded": "2025-05-16T09:08:24.592Z",
+                "createdAt": "2025-05-16T09:08:24.597Z",
+                "updatedAt": "2025-05-18T21:06:53.869Z",
+                "formattedDate": "May 16, 2025",
+                "discountPrice": 100,
+                "id": "68270088d15cd5f1faebad27"
+            },
+            {
+                "promotionPlan": {
+                    "features": {
+                        "priorityListing": false,
+                        "featuredProduct": false,
+                        "enhancedVisibility": false,
+                        "analyticsAccess": false,
+                        "customBadge": false
+                    },
+                    "type": "free",
+                    "price": 0,
+                    "isNotified": false,
+                    "isExpired": false,
+                    "startDate": "2025-05-16T09:02:56.267Z"
+                },
+                "_id": "6826ff40d15cd5f1faebad22",
+                "name": "Ultra Pro Smartphone 128GB",
+                "price": 120000,
+                "discount": 10,
+                "description": "Latest model smartphone with 128GB storage, 8GB RAM, 6.5-inch AMOLED display, 50MP quad camera, and fast charging.",
+                "images": [
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747386162/marketplace/egzocvnqyy0jgi9uyxlb.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747386168/marketplace/bd2yu5wcya1xab7ac4dj.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747386178/marketplace/o6k5eixe8bn7w0drenhn.jpg"
+                ],
+                "categoryId": "682684d3496ee29f9124e18a",
+                "subcategory": "Smartphones",
+                "owner": {
+                    "_id": "6824dc2494cfe375bf50cfaf",
+                    "username": "hydi Eghan",
+                    "profilePicture": "",
+                    "id": "6824dc2494cfe375bf50cfaf"
+                },
+                "views": 17,
+                "rating": 0,
+                "numReviews": 0,
+                "condition": "new",
+                "tags": [],
+                "reviews": [],
+                "dateUploaded": "2025-05-16T09:02:56.267Z",
+                "createdAt": "2025-05-16T09:02:56.269Z",
+                "updatedAt": "2025-05-18T13:25:51.783Z",
+                "formattedDate": "May 16, 2025",
+                "discountPrice": 108000,
+                "id": "6826ff40d15cd5f1faebad22"
+            },
+            {
+                "promotionPlan": {
+                    "features": {
+                        "priorityListing": false,
+                        "featuredProduct": false,
+                        "enhancedVisibility": false,
+                        "analyticsAccess": false,
+                        "customBadge": false
+                    },
+                    "type": "free",
+                    "price": 0,
+                    "isNotified": false,
+                    "isExpired": false,
+                    "startDate": "2025-05-16T09:00:26.421Z"
+                },
+                "_id": "6826feaad15cd5f1faebad1d",
+                "name": "Professional Art Kit",
+                "price": 800,
+                "discount": null,
+                "description": "Complete art kit with watercolor paints, acrylic paints, brushes, sketch pads, pastels, and color pencils for artists of all levels.",
+                "images": [
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747386015/marketplace/o6eq7amewy0kn7ddkukk.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747386018/marketplace/eqgchdgyzrtxjztv19ch.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747386028/marketplace/jznop7roaa58ixp6w4d8.jpg"
+                ],
+                "categoryId": "6824dcc594cfe375bf50cfbc",
+                "subcategory": "Art Supplies",
+                "owner": {
+                    "_id": "6824dc2494cfe375bf50cfaf",
+                    "username": "hydi Eghan",
+                    "profilePicture": "",
+                    "id": "6824dc2494cfe375bf50cfaf"
+                },
+                "views": 18,
+                "rating": 0,
+                "numReviews": 0,
+                "condition": "new",
+                "tags": [],
+                "reviews": [],
+                "dateUploaded": "2025-05-16T09:00:26.420Z",
+                "createdAt": "2025-05-16T09:00:26.425Z",
+                "updatedAt": "2025-05-16T12:28:00.246Z",
+                "formattedDate": "May 16, 2025",
+                "discountPrice": 800,
+                "id": "6826feaad15cd5f1faebad1d"
+            },
+            {
+                "promotionPlan": {
+                    "features": {
+                        "priorityListing": false,
+                        "featuredProduct": false,
+                        "enhancedVisibility": false,
+                        "analyticsAccess": false,
+                        "customBadge": false
+                    },
+                    "type": "free",
+                    "price": 0,
+                    "isNotified": false,
+                    "isExpired": false,
+                    "startDate": "2025-05-16T08:58:43.002Z"
+                },
+                "_id": "6826fe42d15cd5f1faebad18",
+                "name": "Complete Stationery Set",
+                "price": 4500,
+                "discount": null,
+                "description": "All-in-one stationery set including pens, pencils, erasers, rulers, highlighters, and sticky notes for school or office use.",
+                "images": [
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747385910/marketplace/gsvn8h75djfoupszzbqx.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747385917/marketplace/zevryix2syulhxudqi9w.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747385925/marketplace/tj6un5kpuerloxycmyg4.jpg"
+                ],
+                "categoryId": "6824dcc594cfe375bf50cfbc",
+                "subcategory": "Textbooks",
+                "owner": {
+                    "_id": "6824dc2494cfe375bf50cfaf",
+                    "username": "hydi Eghan",
+                    "profilePicture": "",
+                    "id": "6824dc2494cfe375bf50cfaf"
+                },
+                "views": 2,
+                "rating": 0,
+                "numReviews": 0,
+                "condition": "new",
+                "tags": [],
+                "reviews": [],
+                "dateUploaded": "2025-05-16T08:58:43.002Z",
+                "createdAt": "2025-05-16T08:58:43.005Z",
+                "updatedAt": "2025-05-16T10:41:05.443Z",
+                "formattedDate": "May 16, 2025",
+                "discountPrice": 4500,
+                "id": "6826fe42d15cd5f1faebad18"
+            },
+            {
+                "promotionPlan": {
+                    "features": {
+                        "priorityListing": false,
+                        "featuredProduct": false,
+                        "enhancedVisibility": false,
+                        "analyticsAccess": false,
+                        "customBadge": false
+                    },
+                    "type": "free",
+                    "price": 0,
+                    "isNotified": false,
+                    "isExpired": false,
+                    "startDate": "2025-05-16T08:54:31.374Z"
+                },
+                "_id": "6826fd47d15cd5f1faebad13",
+                "name": "Premium Spiral Notebook (5-Pack)",
+                "price": 3500,
+                "discount": 5,
+                "description": "Set of 5 high-quality A4 spiral notebooks with 200 pages each. Hardcover with dividers and pocket folders.",
+                "images": [
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747385673/marketplace/alhni5u5cn9i7f77hhnd.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747385673/marketplace/ggiwibjqe2ukvj8f24pb.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747385673/marketplace/ig1pebgeb5zgpwgtqgbm.jpg"
+                ],
+                "categoryId": "6824dcc594cfe375bf50cfbc",
+                "subcategory": "Textbooks",
+                "owner": {
+                    "_id": "6824dc2494cfe375bf50cfaf",
+                    "username": "hydi Eghan",
+                    "profilePicture": "",
+                    "id": "6824dc2494cfe375bf50cfaf"
+                },
+                "views": 2,
+                "rating": 0,
+                "numReviews": 0,
+                "condition": "new",
+                "tags": [],
+                "reviews": [],
+                "dateUploaded": "2025-05-16T08:54:31.374Z",
+                "createdAt": "2025-05-16T08:54:31.380Z",
+                "updatedAt": "2025-05-16T11:52:59.221Z",
+                "formattedDate": "May 16, 2025",
+                "discountPrice": 3325,
+                "id": "6826fd47d15cd5f1faebad13"
+            },
+            {
+                "promotionPlan": {
+                    "features": {
+                        "priorityListing": false,
+                        "featuredProduct": false,
+                        "enhancedVisibility": false,
+                        "analyticsAccess": false,
+                        "customBadge": false
+                    },
+                    "type": "free",
+                    "price": 0,
+                    "isNotified": false,
+                    "isExpired": false,
+                    "startDate": "2025-05-16T08:50:17.477Z"
+                },
+                "_id": "6826fc49d15cd5f1faebad0e",
+                "name": "Introduction to Economics 5th Edition",
+                "price": 12000,
+                "discount": null,
+                "description": "Comprehensive university-level economics textbook covering micro and macroeconomics with practice problems and case studies.",
+                "images": [
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747385419/marketplace/pi1qezhnqshmaoyf2nhp.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747385419/marketplace/xcmrvvu3tn3uuyaeuaqm.jpg"
+                ],
+                "categoryId": "6824dcc594cfe375bf50cfbc",
+                "subcategory": "Textbooks",
+                "owner": {
+                    "_id": "6824dc2494cfe375bf50cfaf",
+                    "username": "hydi Eghan",
+                    "profilePicture": "",
+                    "id": "6824dc2494cfe375bf50cfaf"
+                },
+                "views": 0,
+                "rating": 0,
+                "numReviews": 0,
+                "condition": "new",
+                "tags": [],
+                "reviews": [],
+                "dateUploaded": "2025-05-16T08:50:17.477Z",
+                "createdAt": "2025-05-16T08:50:17.491Z",
+                "updatedAt": "2025-05-16T08:50:17.491Z",
+                "formattedDate": "May 16, 2025",
+                "discountPrice": 12000,
+                "id": "6826fc49d15cd5f1faebad0e"
+            },
+            {
+                "promotionPlan": {
+                    "features": {
+                        "priorityListing": false,
+                        "featuredProduct": false,
+                        "enhancedVisibility": false,
+                        "analyticsAccess": false,
+                        "customBadge": false
+                    },
+                    "type": "free",
+                    "price": 0,
+                    "isNotified": false,
+                    "isExpired": false,
+                    "startDate": "2025-05-14T18:40:45.519Z"
+                },
+                "_id": "6824e3ad8d564718f47f68f4",
+                "name": "Viilage Lover",
+                "price": 200,
+                "discount": 90,
+                "description": "A story featuring a village lover and its recommende for adults only",
+                "images": [
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747248042/marketplace/lfhvffbbx2wsoz7dxwzr.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747248045/marketplace/jn8hgdnzcvspgqzu0bgc.jpg",
+                    "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747248046/marketplace/z8txl3ivsrsric8mlch3.jpg"
+                ],
+                "categoryId": "6824dcc594cfe375bf50cfbc",
+                "subcategory": "Stationery",
+                "owner": {
+                    "_id": "6824d84894cfe375bf50cf84",
+                    "username": "Agyemang Kono",
+                    "profilePicture": "",
+                    "id": "6824d84894cfe375bf50cf84"
+                },
+                "views": 7,
+                "rating": 5,
+                "numReviews": 1,
+                "condition": "new",
+                "tags": [],
+                "reviews": [
+                    {
+                        "user": "6824d84894cfe375bf50cf84",
+                        "rating": 5,
+                        "comment": "Great product! Works perfectly.",
+                        "_id": "6824eac6e05eaff7ca8011f9",
+                        "createdAt": "2025-05-14T19:11:02.377Z",
+                        "id": "6824eac6e05eaff7ca8011f9"
+                    }
+                ],
+                "dateUploaded": "2025-05-14T18:40:45.519Z",
+                "createdAt": "2025-05-14T18:40:45.532Z",
+                "updatedAt": "2025-05-16T11:53:45.640Z",
+                "formattedDate": "May 14, 2025",
+                "discountPrice": 19.999999999999996,
+                "id": "6824e3ad8d564718f47f68f4"
+            },
+            {
+                "promotionPlan": {
+                    "features": {
+                        "priorityListing": false,
+                        "featuredProduct": false,
+                        "enhancedVisibility": false,
+                        "analyticsAccess": false,
+                        "customBadge": false
+                    },
+                    "type": "free",
+                    "price": 0,
+                    "isNotified": false,
+                    "isExpired": false,
+                    "startDate": "2025-05-14T18:32:04.301Z"
+                },
+                "_id": "6824e1a48d564718f47f68ef",
+                "name": "Ananse In the Land Of Idiots",
+                "price": 1000,
+                "discount": 90,
+                "description": "Nice story book for all ages",
+                "images": [],
+                "categoryId": "6824dcc594cfe375bf50cfbc",
+                "subcategory": "Stationery",
+                "owner": {
+                    "_id": "6824d84894cfe375bf50cf84",
+                    "username": "Agyemang Kono",
+                    "profilePicture": "",
+                    "id": "6824d84894cfe375bf50cf84"
+                },
+                "views": 2,
+                "rating": 0,
+                "numReviews": 0,
+                "condition": "new",
+                "tags": [],
+                "reviews": [],
+                "dateUploaded": "2025-05-14T18:32:04.301Z",
+                "createdAt": "2025-05-14T18:32:04.319Z",
+                "updatedAt": "2025-05-16T10:43:00.918Z",
+                "formattedDate": "May 14, 2025",
+                "discountPrice": 99.99999999999997,
+                "id": "6824e1a48d564718f47f68ef"
+            },
+            {
+                "promotionPlan": {
+                    "features": {
+                        "priorityListing": false,
+                        "featuredProduct": false,
+                        "enhancedVisibility": false,
+                        "analyticsAccess": false,
+                        "customBadge": false
+                    },
+                    "type": "free",
+                    "price": 0,
+                    "isNotified": false,
+                    "isExpired": false,
+                    "startDate": "2025-05-14T18:13:14.681Z"
+                },
+                "_id": "6824dd3a94cfe375bf50cfc4",
+                "name": "Oliver twist",
+                "price": 1000,
+                "discount": 90,
+                "description": "Nice story book for all ages",
+                "images": [],
+                "categoryId": "6824dcc594cfe375bf50cfbc",
+                "subcategory": "Stationery",
+                "owner": {
+                    "_id": "6824dc2494cfe375bf50cfaf",
+                    "username": "hydi Eghan",
+                    "profilePicture": "",
+                    "id": "6824dc2494cfe375bf50cfaf"
+                },
+                "views": 2,
+                "rating": 0,
+                "numReviews": 0,
+                "condition": "new",
+                "tags": [],
+                "reviews": [],
+                "dateUploaded": "2025-05-14T18:13:14.681Z",
+                "createdAt": "2025-05-14T18:13:14.685Z",
+                "updatedAt": "2025-05-16T11:54:09.284Z",
+                "formattedDate": "May 14, 2025",
+                "discountPrice": 99.99999999999997,
+                "id": "6824dd3a94cfe375bf50cfc4"
+            }
+        ]
+    }
+}

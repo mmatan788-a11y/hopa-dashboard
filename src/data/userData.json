@@ -1,0 +1,123 @@
+{
+    "status": "success",
+    "results": 4,
+    "data": {
+        "users": [
+            {
+                "_id": "6824d84894cfe375bf50cf84",
+                "username": "Agyemang Kono",
+                "email": "updated@example.com",
+                "phone": "1111111111",
+                "authProvider": "local",
+                "isVerified": false,
+                "profilePicture": "",
+                "wishlist": [
+                    "6824e3ad8d564718f47f68f4"
+                ],
+                "messages": [
+                    "6824e83ee05eaff7ca8011dc"
+                ],
+                "uploadedProducts": [
+                    "6824e1a48d564718f47f68ef",
+                    "6824e3ad8d564718f47f68f4"
+                ],
+                "storeTitle": "My Store",
+                "location": "New York",
+                "storeBio": "Best deals in town",
+                "deviceToken": null,
+                "role": "user",
+                "isSeller": true,
+                "notifications": [],
+                "viewedProducts": [],
+                "createdAt": "2025-05-14T17:52:08.668Z",
+                "updatedAt": "2025-05-14T17:52:08.668Z",
+                "__v": 0,
+                "id": "6824d84894cfe375bf50cf84"
+            },
+            {
+                "_id": "6824dc2494cfe375bf50cfaf",
+                "username": "hydi Eghan",
+                "email": "esseldacosta0@gmail.com",
+                "phone": "0595309592",
+                "authProvider": "local",
+                "isVerified": false,
+                "profilePicture": "",
+                "wishlist": [
+                    "6824e3ad8d564718f47f68f4"
+                ],
+                "messages": [
+                    "6824e83ee05eaff7ca8011dc"
+                ],
+                "uploadedProducts": [
+                    "6824dd3a94cfe375bf50cfc4",
+                    "6826fc49d15cd5f1faebad0e",
+                    "6826fd47d15cd5f1faebad13",
+                    "6826fe42d15cd5f1faebad18",
+                    "6826feaad15cd5f1faebad1d",
+                    "6826ff40d15cd5f1faebad22",
+                    "68270088d15cd5f1faebad27"
+                ],
+                "storeTitle": "",
+                "location": "Unknown",
+                "storeBio": "",
+                "deviceToken": null,
+                "role": "admin",
+                "isSeller": false,
+                "notifications": [],
+                "viewedProducts": [],
+                "createdAt": "2025-05-14T18:08:36.337Z",
+                "updatedAt": "2025-05-14T18:08:36.337Z",
+                "__v": 0,
+                "id": "6824dc2494cfe375bf50cfaf"
+            },
+            {
+                "_id": "68271002d15cd5f1faebad75",
+                "username": "Hydi",
+                "email": "hydi@gmail.com",
+                "phone": "0000000000",
+                "authProvider": "local",
+                "isVerified": false,
+                "profilePicture": "https://res.cloudinary.com/ds6zuzsmd/image/upload/v1747390818/marketplace/profiles/qsxpmbu6njxplev7loiz.jpg",
+                "wishlist": [],
+                "messages": [],
+                "uploadedProducts": [],
+                "storeTitle": "",
+                "location": "Unknown",
+                "storeBio": "",
+                "deviceToken": null,
+                "role": "user",
+                "isSeller": false,
+                "notifications": [],
+                "viewedProducts": [],
+                "createdAt": "2025-05-16T10:14:26.069Z",
+                "updatedAt": "2025-05-16T10:14:26.069Z",
+                "__v": 0,
+                "id": "68271002d15cd5f1faebad75"
+            },
+            {
+                "_id": "682729b7711bc1829fdbea0f",
+                "username": "Kono",
+                "email": "kono@gmail.com",
+                "phone": "0203695211",
+                "authProvider": "local",
+                "isVerified": false,
+                "profilePicture": "",
+                "wishlist": [],
+                "messages": [],
+                "uploadedProducts": [],
+                "storeTitle": "",
+                "location": "Unknown",
+                "storeBio": "",
+                "deviceToken": null,
+                "role": "user",
+                "isSeller": false,
+                "notifications": [],
+                "viewedProducts": [],
+                "createdAt": "2025-05-16T12:04:07.653Z",
+                "updatedAt": "2025-05-16T12:04:07.653Z",
+                "__v": 0,
+                "id": "682729b7711bc1829fdbea0f"
+            }
+        ]
+    }
+}
