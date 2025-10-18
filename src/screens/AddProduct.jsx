@@ -198,7 +198,7 @@ const AddProducts = () => {
 
         // Fetch categories
         const categoriesResponse = await axios.get(
-          'https://clark-backend.onrender.com/api/v1/categories',
+          'https://hope-server-rho1.onrender.com/api/v1/categories',
           {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -209,7 +209,7 @@ const AddProducts = () => {
 
         // Fetch promotion plans
         const promotionsResponse = await axios.get(
-          'https://clark-backend.onrender.com/api/v1/payments/promotion-plans',
+          'https://hope-server-rho1.onrender.com/api/v1/payments/promotion-plans',
           {
             headers: {
               'Authorization': `Bearer ${token}`
@@ -244,7 +244,7 @@ const AddProducts = () => {
           const token = localStorage.getItem('accessToken');
           
           const response = await axios.get(
-            `https://clark-backend.onrender.com/api/v1/payments/check-status/${paymentReference}`,
+            `https://hope-server-rho1.onrender.com/api/v1/payments/check-status/${paymentReference}`,
             {
               headers: {
                 'Authorization': `Bearer ${token}`
@@ -423,7 +423,7 @@ const AddProducts = () => {
       if (selectedPromotion === 'free') {
         // For free plans, use the original endpoint
         const response = await axios.post(
-          'https://clark-backend.onrender.com/api/v1/products',
+          'https://hope-server-rho1.onrender.com/api/v1/products',
           formData,
           {
             headers: {
@@ -466,7 +466,7 @@ const AddProducts = () => {
         }
 
         const response = await axios.post(
-          'https://clark-backend.onrender.com/api/v1/payments/create-premium-payment',
+          'https://hope-server-rho1.onrender.com/api/v1/payments/create-premium-payment',
           formData,
           {
             headers: {

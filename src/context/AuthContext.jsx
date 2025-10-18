@@ -82,7 +82,7 @@ export const AuthProvider = ({ children }) => {
         redirect: "follow",
       };
       
-      const response = await fetch("https://clark-backend.onrender.com/api/v1/auth/refresh-token", requestOptions);
+      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/auth/refresh-token", requestOptions);
       const result = await response.json();
       
       if (!response.ok) {
@@ -124,7 +124,7 @@ export const AuthProvider = ({ children }) => {
         redirect: "follow"
       };
       
-      const response = await fetch("https://clark-backend.onrender.com/api/v1/users/me", requestOptions);
+      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/users/me", requestOptions);
       
       if (!response.ok) {
         // Handle token expiration
@@ -185,7 +185,7 @@ export const AuthProvider = ({ children }) => {
         redirect: "follow"
       };
       
-      const response = await fetch("https://clark-backend.onrender.com/api/v1/auth/login", requestOptions);
+      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/auth/login", requestOptions);
       const result = await response.json();
       
       if (response.ok && result.status === "success") {
@@ -259,7 +259,7 @@ export const AuthProvider = ({ children }) => {
         redirect: "follow"
       };
       
-      const response = await fetch("https://clark-backend.onrender.com/api/v1/auth/register", requestOptions);
+      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/auth/register", requestOptions);
       const result = await response.json();
       
       if (response.ok && result.status === "success") {
@@ -328,7 +328,7 @@ export const AuthProvider = ({ children }) => {
         redirect: "follow"
       };
       
-      const response = await fetch("https://clark-backend.onrender.com/api/v1/users/me", requestOptions);
+      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/users/me", requestOptions);
       
       if (response.status === 401) {
         // Try to refresh token
@@ -338,7 +338,7 @@ export const AuthProvider = ({ children }) => {
             // Retry with new token
             myHeaders.set("Authorization", `Bearer ${newToken}`);
             const retryOptions = { ...requestOptions, headers: myHeaders };
-            const retryResponse = await fetch("https://clark-backend.onrender.com/api/v1/users/me", retryOptions);
+            const retryResponse = await fetch("https://hope-server-rho1.onrender.com/api/v1/users/me", retryOptions);
             const retryResult = await retryResponse.json();
             
             if (retryResponse.ok && retryResult.status === "success") {

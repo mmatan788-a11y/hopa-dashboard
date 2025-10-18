@@ -74,14 +74,14 @@ const AddPromoScreen = () => {
         redirect: "follow"
       };
 
-      const response = await fetch("https://clark-backend.onrender.com/api/v1/promotions", requestOptions);
+      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/promotions", requestOptions);
       
       if (response.status === 401) {
         try {
           const newToken = await refreshToken();
           if (newToken) {
             myHeaders.set("Authorization", `Bearer ${newToken}`);
-            const retryResponse = await fetch("https://clark-backend.onrender.com/api/v1/promotions", {
+            const retryResponse = await fetch("https://hope-server-rho1.onrender.com/api/v1/promotions", {
               ...requestOptions,
               headers: myHeaders
             });

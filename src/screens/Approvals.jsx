@@ -60,7 +60,7 @@ const Approvals = () => {
         redirect: "follow"
       };
 
-      const response = await fetch("https://clark-backend.onrender.com/api/v1/users/seller-applications", requestOptions);
+      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/users/seller-applications", requestOptions);
       
       if (response.status === 401) {
         setError('Session expired. Please log in again.');
@@ -145,7 +145,7 @@ const Approvals = () => {
         redirect: "follow"
       };
 
-      const response = await fetch(`https://clark-backend.onrender.com/api/v1/users/seller-applications/${applicationId}/review`, requestOptions);
+      const response = await fetch(`https://hope-server-rho1.onrender.com/api/v1/users/seller-applications/${applicationId}/review`, requestOptions);
       
       if (!response.ok) {
         throw new Error('Failed to review application');

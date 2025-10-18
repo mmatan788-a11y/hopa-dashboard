@@ -51,7 +51,7 @@ const ProductScreen = () => {
         redirect: "follow"
       };
       
-      const response = await fetch("https://clark-backend.onrender.com/api/v1/products", requestOptions);
+      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/products", requestOptions);
       
       // Handle token expiration
       if (response.status === 401) {
@@ -70,7 +70,7 @@ const ProductScreen = () => {
               redirect: "follow"
             };
             
-            const retryResponse = await fetch("https://clark-backend.onrender.com/api/v1/products", retryOptions);
+            const retryResponse = await fetch("https://hope-server-rho1.onrender.com/api/v1/products", retryOptions);
             
             if (retryResponse.status === 401) {
               throw new Error('Token refresh failed - authentication required');
@@ -156,7 +156,7 @@ const ProductScreen = () => {
         redirect: "follow"
       };
       
-      const response = await fetch(`https://clark-backend.onrender.com/api/v1/products/${productId}`, requestOptions);
+      const response = await fetch(`https://hope-server-rho1.onrender.com/api/v1/products/${productId}`, requestOptions);
       
       // Handle token expiration
       if (response.status === 401) {
@@ -175,7 +175,7 @@ const ProductScreen = () => {
               redirect: "follow"
             };
             
-            const retryResponse = await fetch(`https://clark-backend.onrender.com/api/v1/products/${productId}`, retryOptions);
+            const retryResponse = await fetch(`https://hope-server-rho1.onrender.com/api/v1/products/${productId}`, retryOptions);
             
             if (retryResponse.status === 401) {
               throw new Error('Token refresh failed - authentication required');

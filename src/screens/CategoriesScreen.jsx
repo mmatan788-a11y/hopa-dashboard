@@ -49,7 +49,7 @@ const CategoriesScreen = () => {
         redirect: "follow"
       };
 
-      const response = await fetch("https://clark-backend.onrender.com/api/v1/categories", requestOptions);
+      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/categories", requestOptions);
       
       // Handle token expiration
       if (response.status === 401) {
@@ -68,7 +68,7 @@ const CategoriesScreen = () => {
               redirect: "follow"
             };
             
-            const retryResponse = await fetch("https://clark-backend.onrender.com/api/v1/categories", retryOptions);
+            const retryResponse = await fetch("https://hope-server-rho1.onrender.com/api/v1/categories", retryOptions);
             
             if (retryResponse.status === 401) {
               throw new Error('Token refresh failed - authentication required');
@@ -204,7 +204,7 @@ const CategoriesScreen = () => {
           redirect: "follow"
         };
 
-        const response = await fetch(`https://clark-backend.onrender.com/api/v1/categories/${id}`, requestOptions);
+        const response = await fetch(`https://hope-server-rho1.onrender.com/api/v1/categories/${id}`, requestOptions);
         
         // Handle token expiration
         if (response.status === 401) {
@@ -220,7 +220,7 @@ const CategoriesScreen = () => {
                 redirect: "follow"
               };
               
-              const retryResponse = await fetch(`https://clark-backend.onrender.com/api/v1/categories/${id}`, retryOptions);
+              const retryResponse = await fetch(`https://hope-server-rho1.onrender.com/api/v1/categories/${id}`, retryOptions);
               
               if (retryResponse.ok) {
                 setCategories(categories.filter(cat => cat._id !== id));
@@ -281,7 +281,7 @@ const CategoriesScreen = () => {
         redirect: "follow"
       };
       
-      const url = `https://clark-backend.onrender.com/api/v1/categories/${updatedCategory._id}`;
+      const url = `https://hope-server-rho1.onrender.com/api/v1/categories/${updatedCategory._id}`;
 
       const response = await fetch(url, requestOptions);
       

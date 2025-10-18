@@ -146,7 +146,7 @@ const AddCategory = () => {
       });
 
       const response = await axios.post(
-        'https://clark-backend.onrender.com/api/v1/categories',
+        'https://hope-server-rho1.onrender.com/api/v1/categories',
         formData,
         {
           headers: {

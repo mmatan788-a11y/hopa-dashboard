@@ -48,7 +48,7 @@ const fetchUsers = async () => {
       redirect: "follow"
     };
 
-    const response = await fetch("https://clark-backend.onrender.com/api/v1/users", requestOptions);
+    const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/users", requestOptions);
     
     // Handle token expiration
     if (response.status === 401) {
@@ -67,7 +67,7 @@ const fetchUsers = async () => {
             redirect: "follow"
           };
           
-          const retryResponse = await fetch("https://clark-backend.onrender.com/api/v1/users", retryOptions);
+          const retryResponse = await fetch("https://hope-server-rho1.onrender.com/api/v1/users", retryOptions);
           
           if (retryResponse.status === 401) {
             throw new Error('Token refresh failed - authentication required');

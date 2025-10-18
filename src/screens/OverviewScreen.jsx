@@ -259,7 +259,7 @@ const OverviewScreen = () => {
 
   const fetchProducts = async (token, refreshToken) => {
     try {
-      const response = await fetch('https://clark-backend.onrender.com/api/v1/products', {
+      const response = await fetch('https://hope-server-rho1.onrender.com/api/v1/products', {
         method: 'GET',
         headers: {
           'Authorization': `Bearer ${token}`,
@@ -331,7 +331,7 @@ const OverviewScreen = () => {
         redirect: "follow"
       };
 
-      const response = await fetch("https://clark-backend.onrender.com/api/v1/users/seller-applications", requestOptions);
+      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/users/seller-applications", requestOptions);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);

@@ -38,7 +38,7 @@ const PromoScreen = () => {
         redirect: "follow"
       };
       
-      const response = await fetch("https://clark-backend.onrender.com/api/v1/promotions", requestOptions);
+      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/promotions", requestOptions);
       
       if (response.status === 401) {
         try {
@@ -54,7 +54,7 @@ const PromoScreen = () => {
               redirect: "follow"
             };
             
-            const retryResponse = await fetch("https://clark-backend.onrender.com/api/v1/promotions", retryOptions);
+            const retryResponse = await fetch("https://hope-server-rho1.onrender.com/api/v1/promotions", retryOptions);
             
             if (retryResponse.status === 401) {
               throw new Error('Token refresh failed - authentication required');
@@ -119,13 +119,13 @@ const PromoScreen = () => {
         redirect: "follow"
       };
 
-      const response = await fetch(`https://clark-backend.onrender.com/api/v1/promotions/${planId}`, requestOptions);
+      const response = await fetch(`https://hope-server-rho1.onrender.com/api/v1/promotions/${planId}`, requestOptions);
       
       if (response.status === 401) {
         const newToken = await refreshToken();
         if (newToken) {
           myHeaders.set("Authorization", `Bearer ${newToken}`);
-          const retryResponse = await fetch(`https://clark-backend.onrender.com/api/v1/promotions/${planId}`, {
+          const retryResponse = await fetch(`https://hope-server-rho1.onrender.com/api/v1/promotions/${planId}`, {
             ...requestOptions,
             headers: myHeaders
           });
@@ -163,13 +163,13 @@ const PromoScreen = () => {
         redirect: "follow"
       };
 
-      const response = await fetch(`https://clark-backend.onrender.com/api/v1/promotions/${planId}`, requestOptions);
+      const response = await fetch(`https://hope-server-rho1.onrender.com/api/v1/promotions/${planId}`, requestOptions);
       
       if (response.status === 401) {
         const newToken = await refreshToken();
         if (newToken) {
           myHeaders.set("Authorization", `Bearer ${newToken}`);
-          const retryResponse = await fetch(`https://clark-backend.onrender.com/api/v1/promotions/${planId}`, {
+          const retryResponse = await fetch(`https://hope-server-rho1.onrender.com/api/v1/promotions/${planId}`, {
             ...requestOptions,
             headers: myHeaders
           });
