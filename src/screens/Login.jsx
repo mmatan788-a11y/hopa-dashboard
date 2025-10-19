@@ -238,22 +238,7 @@ const handleLogin = async (e) => {
           </button>
         </form>
 
-        {/* Footer */}
-        <p className="text-gray-400 text-center mt-6 text-sm">
-          Don't have an account?{" "}
-          <span 
-            onClick={() => navigate("/signup")}
-            className="text-neon-pink cursor-pointer hover:text-neon-blue transition duration-300"
-          >
-            Sign Up
-          </span>
-          <span 
-            onClick={() => navigate("/adminlogin")}
-            className="text-neon-pink cursor-pointer hover:text-neon-blue ml-4 transition duration-300"
-          >
-            Admin
-          </span>
-        </p>
+      
       </div>
     </div>
   );
