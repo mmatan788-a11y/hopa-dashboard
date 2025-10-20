@@ -7,7 +7,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
-// Ghana regions and towns data
+// Ghana regions and towns data (same as provided)
 const GHANA_LOCATIONS = [
   {
     region: "Greater Accra",
@@ -170,7 +170,6 @@ const GHANA_LOCATIONS = [
     ]
   }
 ];
-
 const AddProducts = () => {
   const { user, fetchUserProfile } = useAuth();
   const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm();
@@ -189,7 +188,7 @@ const AddProducts = () => {
   const [paymentData, setPaymentData] = useState(null);
   const [paymentReference, setPaymentReference] = useState(null);
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
-  const [paymentWindowOpened, setPaymentWindowOpened] = useState(false);
+  const [hasRedirected, setHasRedirected] = useState(false);
 
   // Fetch categories and promotion plans
   useEffect(() => {
@@ -216,21 +215,16 @@ const AddProducts = () => {
     fetchData();
   }, []);
 
-  // Auto-open payment window when paymentData is available
+  // Auto-redirect to payment URL when in payment_processing step
   useEffect(() => {
-    if (paymentData && paymentStep === 'payment_processing' && !paymentWindowOpened) {
-      const paymentWin = window.open(paymentData.paymentUrl, '_blank');
-      if (paymentWin) {
-        setPaymentWindowOpened(true);
-      } else {
-        toast.warn('Popup blocked! Please allow popups to proceed with payment.', {
-          autoClose: 6000,
-        });
-      }
+    if (paymentStep === 'payment_processing' && paymentData && !hasRedirected) {
+      setHasRedirected(true);
+      // Redirect immediately to payment gateway
+      window.location.href = paymentData.paymentUrl;
     }
-  }, [paymentData, paymentStep, paymentWindowOpened]);
+  }, [paymentStep, paymentData, hasRedirected]);
 
-  // Check payment status periodically
+  // Check payment status periodically (when user returns manually or via callback)
   useEffect(() => {
     let intervalId;
     if (paymentReference && paymentStep === 'payment_processing') {
@@ -252,7 +246,7 @@ const AddProducts = () => {
             setPaymentStep('form');
             setPaymentReference(null);
             setPaymentData(null);
-            setPaymentWindowOpened(false);
+            setHasRedirected(false);
             toast.error('Payment failed or was cancelled. Please try again.');
             clearInterval(intervalId);
           }
@@ -284,17 +278,9 @@ const AddProducts = () => {
         return;
       }
     }
-    // Validate location fields
-    if (!data.region) {
-      toast.error('Please select a region');
-      return;
-    }
-    if (!data.town) {
-      toast.error('Please select a town');
-      return;
-    }
-    if (!data.specificAddress) {
-      toast.error('Please enter a specific address');
+    // Validate location
+    if (!data.region || !data.town || !data.specificAddress) {
+      toast.error('Please complete all location fields');
       return;
     }
 
@@ -339,8 +325,9 @@ const AddProducts = () => {
         setPaymentData(responseData);
         setPaymentReference(responseData.reference);
         setPaymentStep('payment_processing');
-        setPaymentWindowOpened(false); // Reset so useEffect can open it
-        toast.info('Redirecting to payment gateway...');
+        setHasRedirected(false);
+        toast.info('Redirecting to secure payment page...');
+        // Redirect will be handled by useEffect
       }
     } catch (err) {
       console.error('Error submitting product:', err);
@@ -369,7 +356,7 @@ const AddProducts = () => {
     setPaymentStep('form');
     setPaymentData(null);
     setPaymentReference(null);
-    setPaymentWindowOpened(false);
+    setHasRedirected(false);
   };
 
   const handleImageUpload = (e) => {
@@ -415,15 +402,15 @@ const AddProducts = () => {
     return priceMap[type]?.[duration] || 0;
   };
 
-  // === PAYMENT PROCESSING UI ===
+  // === PAYMENT PROCESSING UI (shows briefly before redirect) ===
   if (paymentStep === 'payment_processing') {
     return (
       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
         <div className="text-center py-12">
           <CreditCard className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-4">Processing Payment</h2>
+          <h2 className="text-2xl font-bold mb-4">Redirecting to Payment</h2>
           <p className="text-gray-600 mb-6">
-            Your product is created. Completing payment in a new tab...
+            Please wait while we take you to the secure payment page...
           </p>
 
           {paymentData && (
@@ -443,35 +430,19 @@ const AddProducts = () => {
           )}
 
           <div className="flex items-center justify-center space-x-2 mb-6">
-            {isCheckingPayment ? (
-              <>
-                <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                <span className="text-sm text-gray-600">Verifying payment...</span>
-              </>
-            ) : (
-              <>
-                <AlertCircle className="h-5 w-5 text-yellow-600" />
-                <span className="text-sm text-gray-600">Waiting for payment confirmation</span>
-              </>
-            )}
+            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
+            <span className="text-sm text-gray-600">Redirecting...</span>
           </div>
 
-          {/* Fallback button if popup was blocked */}
-          <div className="space-y-3">
-            <p className="text-sm text-gray-600">
-              If the payment page didn’t open, please click below:
-            </p>
+          {/* Fallback button in case redirect fails */}
+          {paymentData && (
             <button
-              onClick={() => {
-                const win = window.open(paymentData.paymentUrl, '_blank');
-                if (win) setPaymentWindowOpened(true);
-                else toast.warn('Please allow popups in your browser.');
-              }}
+              onClick={() => (window.location.href = paymentData.paymentUrl)}
               className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
             >
-              Open Payment Page
+              Complete Payment Now
             </button>
-          </div>
+          )}
 
           <div className="mt-8 pt-6 border-t border-gray-200">
             <button
@@ -479,7 +450,7 @@ const AddProducts = () => {
                 setPaymentStep('form');
                 setPaymentReference(null);
                 setPaymentData(null);
-                setPaymentWindowOpened(false);
+                setHasRedirected(false);
               }}
               className="text-gray-600 hover:text-gray-800 transition-colors"
             >
@@ -806,7 +777,7 @@ const AddProducts = () => {
               />
               <span className="flex-1">
                 <span className="block font-medium">Free Plan</span>
-                <span className="block text-sm text-gray-500">Standard visibility for your product</span>
+                <span className="block text-sm text-gray-500">Standard visibility</span>
               </span>
             </label>
             {promotionPlans.map(plan => (
@@ -885,7 +856,7 @@ const AddProducts = () => {
             ) : (
               <span className="flex items-center">
                 <CreditCard className="h-4 w-4 mr-2" />
-                Create Product & Pay (GH₵{getPlanPrice(selectedPromotion, selectedDuration)})
+                Create & Pay (GH₵{getPlanPrice(selectedPromotion, selectedDuration)})
               </span>
             )}
           </button>
