@@ -180,9 +180,10 @@ const AddProducts = () => {
   const [categories, setCategories] = useState([]);
   const [promotionPlans, setPromotionPlans] = useState([]);
   const [selectedPromotion, setSelectedPromotion] = useState('free');
+  const [selectedDuration, setSelectedDuration] = useState(7); // Default to 1 week
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  
+
   // Payment flow states
   const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'payment_processing', 'payment_success'
   const [paymentData, setPaymentData] = useState(null);
@@ -195,7 +196,6 @@ const AddProducts = () => {
       try {
         const token = localStorage.getItem('accessToken');
         if (!token) return;
-
         // Fetch categories
         const categoriesResponse = await axios.get(
           'https://hope-server-rho1.onrender.com/api/v1/categories',
@@ -206,7 +206,6 @@ const AddProducts = () => {
           }
         );
         setCategories(categoriesResponse.data.data.categories);
-
         // Fetch promotion plans
         const promotionsResponse = await axios.get(
           'https://hope-server-rho1.onrender.com/api/v1/payments/promotion-plans',
@@ -229,20 +228,17 @@ const AddProducts = () => {
         });
       }
     };
-
     fetchData();
   }, []);
 
   // Check payment status periodically when payment is processing
   useEffect(() => {
     let intervalId;
-    
     if (paymentReference && paymentStep === 'payment_processing') {
       const checkPaymentStatus = async () => {
         try {
           setIsCheckingPayment(true);
           const token = localStorage.getItem('accessToken');
-          
           const response = await axios.get(
             `https://hope-server-rho1.onrender.com/api/v1/payments/check-status/${paymentReference}`,
             {
@@ -251,9 +247,7 @@ const AddProducts = () => {
               }
             }
           );
-          
           const status = response.data.status;
-          
           if (status === 'success' || status === 'completed') {
             setPaymentStep('payment_success');
             toast.success('Payment successful! Your product is now live with premium promotion.', {
@@ -265,7 +259,6 @@ const AddProducts = () => {
               draggable: true,
             });
             clearInterval(intervalId);
-            
             // Navigate to products page after success
             setTimeout(() => {
               navigate('/vendordashboard/productsmanagement');
@@ -290,12 +283,10 @@ const AddProducts = () => {
           setIsCheckingPayment(false);
         }
       };
-      
       // Check immediately, then every 3 seconds
       checkPaymentStatus();
       intervalId = setInterval(checkPaymentStatus, 3000);
     }
-    
     return () => {
       if (intervalId) {
         clearInterval(intervalId);
@@ -316,7 +307,6 @@ const AddProducts = () => {
       });
       return;
     }
-
     if (productImages.length > 5) {
       toast.error('Maximum 5 images allowed', {
         position: "top-right",
@@ -328,7 +318,6 @@ const AddProducts = () => {
       });
       return;
     }
-
     // Check each image size
     for (const image of productImages) {
       if (image.size > 10 * 1024 * 1024) { // 10MB
@@ -343,7 +332,6 @@ const AddProducts = () => {
         return;
       }
     }
-
     // Validate location fields
     if (!data.region) {
       toast.error('Please select a region', {
@@ -356,7 +344,6 @@ const AddProducts = () => {
       });
       return;
     }
-
     if (!data.town) {
       toast.error('Please select a town', {
         position: "top-right",
@@ -368,7 +355,6 @@ const AddProducts = () => {
       });
       return;
     }
-
     if (!data.specificAddress) {
       toast.error('Please enter a specific address', {
         position: "top-right",
@@ -391,7 +377,6 @@ const AddProducts = () => {
       }
 
       const formData = new FormData();
-      
       // Append basic product data
       formData.append('name', data.productName);
       formData.append('price', data.price);
@@ -399,29 +384,24 @@ const AddProducts = () => {
       formData.append('categoryId', data.categoryId);
       formData.append('subcategory', data.subcategory);
       formData.append('condition', data.condition || 'new');
-      
-      // Append location data (simple format)
+      // Append location data
       formData.append('region', data.region);
       formData.append('town', data.town);
       formData.append('specificAddress', data.specificAddress);
-      
-      // Append optional discount (only if provided and not empty)
+      // Append optional fields
       if (data.discount && data.discount.trim() !== '') {
         formData.append('discount', data.discount);
       }
-      
-      // Append optional tags (only if provided and not empty)
       if (data.tags && data.tags.trim() !== '') {
         formData.append('tags', data.tags);
       }
-      
       // Append images
       productImages.forEach((image, index) => {
         formData.append('images', image);
       });
 
       if (selectedPromotion === 'free') {
-        // For free plans, use the original endpoint
+        // Free plan: direct product creation
         const response = await axios.post(
           'https://hope-server-rho1.onrender.com/api/v1/products',
           formData,
@@ -432,7 +412,6 @@ const AddProducts = () => {
             }
           }
         );
-
         toast.success('Product added successfully!', {
           position: "top-right",
           autoClose: 3000,
@@ -441,29 +420,14 @@ const AddProducts = () => {
           pauseOnHover: true,
           draggable: true,
         });
-        
-        // Reset form
         resetForm();
-
-        // Navigate to products page after a short delay
         setTimeout(() => {
           navigate('/vendordashboard/productsmanagement');
         }, 1500);
       } else {
-        // For premium plans, use the premium payment endpoint
-        const selectedPlan = promotionPlans.find(plan => plan.type === selectedPromotion);
-        if (!selectedPlan) {
-          throw new Error('Selected promotion plan not found');
-        }
-
-        // CRITICAL FIX: Append promotion plan with correct field name (matching Postman example)
+        // Premium plan: send type + duration
         formData.append('promotionPlan[type]', selectedPromotion);
-
-        console.log('Submitting premium product with promotion:', selectedPromotion);
-        console.log('FormData contents:');
-        for (let pair of formData.entries()) {
-          console.log(pair[0] + ': ' + pair[1]);
-        }
+        formData.append('promotionPlan[duration]', selectedDuration.toString());
 
         const response = await axios.post(
           'https://hope-server-rho1.onrender.com/api/v1/payments/create-premium-payment',
@@ -480,7 +444,6 @@ const AddProducts = () => {
         setPaymentData(responseData);
         setPaymentReference(responseData.reference);
         setPaymentStep('payment_processing');
-
         toast.info('Product created! Proceeding to payment...', {
           position: "top-right",
           autoClose: 3000,
@@ -489,11 +452,8 @@ const AddProducts = () => {
           pauseOnHover: true,
           draggable: true,
         });
-
-        // Open payment URL in new window/tab
         window.open(responseData.paymentUrl, '_blank');
       }
-
     } catch (err) {
       console.error('Error submitting product:', err);
       console.error('Response data:', err.response?.data);
@@ -525,6 +485,7 @@ const AddProducts = () => {
     setValue('town', '');
     setValue('specificAddress', '');
     setSelectedPromotion('free');
+    setSelectedDuration(7);
     setPaymentStep('form');
     setPaymentData(null);
     setPaymentReference(null);
@@ -532,8 +493,6 @@ const AddProducts = () => {
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    
-    // Check total number of images
     if (productImages.length + files.length > 5) {
       toast.error('Maximum 5 images allowed', {
         position: "top-right",
@@ -545,10 +504,8 @@ const AddProducts = () => {
       });
       return;
     }
-    
-    // Check each file size
     for (const file of files) {
-      if (file.size > 10 * 1024 * 1024) { // 10MB
+      if (file.size > 10 * 1024 * 1024) {
         toast.error('Each image should be less than 10MB', {
           position: "top-right",
           autoClose: 3000,
@@ -560,7 +517,6 @@ const AddProducts = () => {
         return;
       }
     }
-    
     setProductImages([...productImages, ...files]);
     setError('');
   };
@@ -577,22 +533,29 @@ const AddProducts = () => {
     });
   };
 
-  // Handle region change and reset town
   const handleRegionChange = (e) => {
     const selectedRegion = e.target.value;
     setValue('region', selectedRegion);
-    setValue('town', ''); // Reset town when region changes
+    setValue('town', '');
   };
 
-  // Get subcategories for selected category
   const selectedCategoryId = watch('categoryId');
   const selectedCategory = categories.find(cat => cat._id === selectedCategoryId);
   const subcategories = selectedCategory?.subcategories || [];
 
-  // Get towns for selected region
   const selectedRegion = watch('region');
   const selectedLocationData = GHANA_LOCATIONS.find(loc => loc.region === selectedRegion);
   const availableTowns = selectedLocationData?.towns || [];
+
+  // Get price for selected plan and duration
+  const getPlanPrice = (type, duration) => {
+    const priceMap = {
+      basic: { 7: 25, 14: 40, 30: 60 },
+      premium: { 7: 40, 14: 50, 30: 80 },
+      ultra: { 7: 50, 14: 70, 30: 120 }
+    };
+    return priceMap[type]?.[duration] || 0;
+  };
 
   // Render different steps based on payment flow
   if (paymentStep === 'payment_processing') {
@@ -604,14 +567,13 @@ const AddProducts = () => {
           <p className="text-gray-600 mb-6">
             Your product has been created and is waiting for payment confirmation.
           </p>
-          
           {paymentData && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 max-w-md mx-auto">
               <h3 className="font-semibold mb-3">Payment Details</h3>
               <div className="space-y-2 text-sm">
                 <div className="flex justify-between">
                   <span>Amount:</span>
-                  <span className="font-medium">${paymentData.amount}</span>
+                  <span className="font-medium">GH₵{paymentData.amount}</span>
                 </div>
                 <div className="flex justify-between">
                   <span>Reference:</span>
@@ -620,7 +582,6 @@ const AddProducts = () => {
               </div>
             </div>
           )}
-          
           <div className="flex items-center justify-center space-x-2 mb-6">
             {isCheckingPayment ? (
               <>
@@ -634,7 +595,6 @@ const AddProducts = () => {
               </>
             )}
           </div>
-          
           {paymentData && (
             <div className="space-y-3">
               <p className="text-sm text-gray-600">
@@ -648,7 +608,6 @@ const AddProducts = () => {
               </button>
             </div>
           )}
-          
           <div className="mt-8 pt-6 border-t border-gray-200">
             <button
               onClick={() => {
@@ -694,19 +653,15 @@ const AddProducts = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6">Product Management</h1>
-      
-      {/* Error Messages */}
       {error && (
         <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
           {error}
         </div>
       )}
-      
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Description Section */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Description</h2>
-          
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Product Name*</label>
             <input
@@ -721,22 +676,20 @@ const AddProducts = () => {
               <span className="text-red-500 text-sm">{errors.productName.message}</span>
             )}
           </div>
-          
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">Business Description*</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">product Description*</label>
             <textarea
               className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
                 errors.businessDescription ? 'border-red-500' : 'border-gray-300'
               }`}
               rows={3}
-              placeholder="We've partnered with Coastal Green Wellness based out of Myrtle Beach South Carolina"
+              placeholder="This is a reliable product for all users"
               {...register('businessDescription', { required: 'Description is required' })}
             ></textarea>
             {errors.businessDescription && (
               <span className="text-red-500 text-sm">{errors.businessDescription.message}</span>
             )}
           </div>
-          
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Condition*</label>
             <select
@@ -754,7 +707,6 @@ const AddProducts = () => {
               <span className="text-red-500 text-sm">{errors.condition.message}</span>
             )}
           </div>
-
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">Tags (Optional)</label>
             <input
@@ -767,11 +719,10 @@ const AddProducts = () => {
           </div>
         </section>
 
-        {/* Location Section - Enhanced */}
+        {/* Location Section */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Location*</h2>
           <p className="text-sm text-gray-600 mb-4">Please specify your product location to help customers find items near them.</p>
-          
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -795,7 +746,6 @@ const AddProducts = () => {
                 <span className="text-red-500 text-sm">{errors.region.message}</span>
               )}
             </div>
-            
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Town <span className="text-red-500">*</span>
@@ -822,7 +772,6 @@ const AddProducts = () => {
               )}
             </div>
           </div>
-
           <div className="mb-4">
             <label className="block text-sm font-medium text-gray-700 mb-1">
               Specific Address <span className="text-red-500">*</span>
@@ -845,7 +794,6 @@ const AddProducts = () => {
         {/* Category Section */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Category*</h2>
-          
           <div className="grid grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Main Category</label>
@@ -866,7 +814,6 @@ const AddProducts = () => {
                 <span className="text-red-500 text-sm">{errors.categoryId.message}</span>
               )}
             </div>
-            
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Subcategory</label>
               <select
@@ -893,7 +840,6 @@ const AddProducts = () => {
         {/* Product Images Section */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Product Images* (Max 5, 10MB each)</h2>
-          
           <div className="border-2 border-dashed border-gray-300 rounded-md p-4 hover:border-indigo-400 transition-colors">
             <div className="flex flex-col items-center justify-center py-8">
               <Upload className="h-12 w-12 text-gray-400 mb-2" />
@@ -913,7 +859,6 @@ const AddProducts = () => {
                 Upload Images
               </label>
             </div>
-            
             {productImages.length > 0 && (
               <div className="grid grid-cols-3 gap-4 mt-4">
                 {productImages.map((image, index) => (
@@ -940,10 +885,9 @@ const AddProducts = () => {
         {/* Pricing Section */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Pricing*</h2>
-          
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Price ($)</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">Price (GH₵)</label>
               <input
                 type="number"
                 step="0.01"
@@ -961,7 +905,6 @@ const AddProducts = () => {
                 <span className="text-red-500 text-sm">{errors.price.message}</span>
               )}
             </div>
-            
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Discount (%) - Optional</label>
               <input
@@ -989,9 +932,8 @@ const AddProducts = () => {
         {/* Promotion Section */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Promotion Plan</h2>
-          
           <div className="space-y-3">
-            <label key="free-plan" className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
+            <label className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
               <input
                 type="radio"
                 className="text-indigo-600 focus:ring-indigo-500"
@@ -1003,25 +945,51 @@ const AddProducts = () => {
                 <span className="block text-sm text-gray-500">Standard visibility for your product</span>
               </span>
             </label>
-            
+
             {promotionPlans.map(plan => (
-              <label key={plan._id} className="flex items-center space-x-3 p-3 border rounded-lg hover:bg-gray-50 cursor-pointer">
-                <input
-                  type="radio"
-                  className="text-indigo-600 focus:ring-indigo-500"
-                  checked={selectedPromotion === plan.type}
-                  onChange={() => setSelectedPromotion(plan.type)}
-                />
-                <span className="flex-1">
-                  <span className="block font-medium">{plan.name} (GH₵{plan.price})</span>
-                  <span className="block text-sm text-gray-500">{plan.description}</span>
-                  {selectedPromotion === plan.type && (
-                    <span className="block text-xs text-blue-600 mt-1">
-                      Product will be created first, then payment will activate promotion
-                    </span>
-                  )}
-                </span>
-              </label>
+              <div key={plan.type} className="border rounded-lg p-3">
+                <label className="flex items-center space-x-3 cursor-pointer">
+                  <input
+                    type="radio"
+                    className="text-indigo-600 focus:ring-indigo-500"
+                    checked={selectedPromotion === plan.type}
+                    onChange={() => {
+                      setSelectedPromotion(plan.type);
+                      setSelectedDuration(7); // Reset duration when plan changes
+                    }}
+                  />
+                  <span className="flex-1">
+                    <span className="block font-medium">{plan.name}</span>
+                    <span className="block text-sm text-gray-500">{plan.description}</span>
+                  </span>
+                </label>
+
+                {selectedPromotion === plan.type && (
+                  <div className="mt-3 ml-8 space-y-2">
+                    <p className="text-sm font-medium text-gray-700">Select Duration:</p>
+                    <div className="flex flex-wrap gap-2">
+                      {[7, 14, 30].map(duration => {
+                        const price = getPlanPrice(plan.type, duration);
+                        const label = duration === 7 ? '1 week' : duration === 14 ? '2 weeks' : '1 month';
+                        return (
+                          <button
+                            key={duration}
+                            type="button"
+                            className={`px-3 py-1 text-sm rounded-md border ${
+                              selectedDuration === duration
+                                ? 'bg-indigo-100 border-indigo-500 text-indigo-700'
+                                : 'bg-white border-gray-300 text-gray-700 hover:bg-gray-50'
+                            }`}
+                            onClick={() => setSelectedDuration(duration)}
+                          >
+                            {label} (GH₵{price})
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
             ))}
           </div>
         </section>
@@ -1055,14 +1023,12 @@ const AddProducts = () => {
             ) : (
               <span className="flex items-center">
                 <CreditCard className="h-4 w-4 mr-2" />
-                Create Product & Pay
+                Create Product & Pay (GH₵{getPlanPrice(selectedPromotion, selectedDuration)})
               </span>
             )}
           </button>
         </div>
       </form>
-      
-      {/* Toast Container */}
       <ToastContainer />
     </div>
   );
