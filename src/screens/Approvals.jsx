@@ -32,13 +32,11 @@ const Approvals = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
 
-  // Fetch applications on component mount
   useEffect(() => {
     fetchApplications();
   }, []);
 
   const fetchApplications = async () => {
-    // For demo purposes, using mock data from localStorage
     const token = localStorage.getItem('accessToken') || 'demo-token';
     const refreshToken = localStorage.getItem('refreshToken') || 'demo-refresh-token';
     
@@ -74,12 +72,10 @@ const Approvals = () => {
       }
 
       const result = await response.json();
-      console.log('API Response:', result); // Debug log
+      console.log('API Response:', result);
       
-      // Fixed: Access the correct nested structure
       const applicationsData = result.data?.applications || [];
       
-      // Transform the API data to match your component's expected structure
       const transformedApplications = applicationsData.map(app => ({
         _id: app._id,
         businessName: app.sellerApplication?.storeTitle || 'Unknown Business',
@@ -95,14 +91,14 @@ const Approvals = () => {
         businessRegistration: app.sellerApplication?.businessLicense,
         taxCertificate: app.sellerApplication?.taxCertificate,
         idDocument: app.sellerApplication?.idVerification,
+        passportPhoto: app.sellerApplication?.passportPhoto, // ✅ Added passport photo
         adminNotes: app.sellerApplication?.adminNotes,
         reviewedAt: app.sellerApplication?.reviewedAt,
         reviewedBy: app.sellerApplication?.reviewedBy
-      })).filter(app => app.status !== 'none'); // Filter out applications with 'none' status
+      })).filter(app => app.status !== 'none');
       
       setApplications(transformedApplications);
       
-      // Show success toast only when manually refreshing
       if (applications.length > 0) {
         toast.success('Applications refreshed successfully!');
       }
@@ -151,7 +147,6 @@ const Approvals = () => {
         throw new Error('Failed to review application');
       }
 
-      // Show success toast based on action
       if (action === 'approve') {
         toast.success(`Application approved successfully! 🎉`, {
           position: "top-right",
@@ -172,10 +167,7 @@ const Approvals = () => {
         });
       }
 
-      // Refresh applications list
       await fetchApplications();
-      
-      // Close modal
       setShowModal(false);
       setSelectedApplication(null);
       
@@ -264,7 +256,6 @@ const Approvals = () => {
       />
       
       <div className="max-w-7xl mx-auto">
-        {/* Header */}
         <div className="mb-8">
           <div className="flex items-center justify-between mb-6">
             <div>
@@ -288,7 +279,6 @@ const Approvals = () => {
             </button>
           </div>
 
-          {/* Filters */}
           <div className="flex flex-col sm:flex-row gap-4 mb-6">
             <div className="flex-1 relative">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
@@ -326,7 +316,6 @@ const Approvals = () => {
           </div>
         )}
 
-        {/* Applications Grid */}
         {filteredApplications.length === 0 ? (
           <div className="text-center py-12">
             <div className="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
@@ -398,7 +387,6 @@ const Approvals = () => {
           </div>
         )}
 
-        {/* Modal */}
         {showModal && selectedApplication && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
             <div className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
@@ -416,7 +404,6 @@ const Approvals = () => {
 
               <div className="p-6">
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                  {/* Left Column - Basic Info */}
                   <div className="space-y-6">
                     <div className="bg-gray-50 rounded-xl p-4">
                       <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -473,7 +460,6 @@ const Approvals = () => {
                     )}
                   </div>
 
-                  {/* Right Column - Documents/Images */}
                   <div className="space-y-6">
                     <div className="bg-gray-50 rounded-xl p-4">
                       <h3 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
@@ -481,7 +467,6 @@ const Approvals = () => {
                         Documents & Images
                       </h3>
                       
-                      {/* Business Registration Document */}
                       {selectedApplication.businessRegistration && (
                         <div className="mb-4">
                           <label className="text-sm font-medium text-gray-600 mb-2 block">Business License</label>
@@ -503,7 +488,6 @@ const Approvals = () => {
                         </div>
                       )}
 
-                      {/* Tax Certificate */}
                       {selectedApplication.taxCertificate && (
                         <div className="mb-4">
                           <label className="text-sm font-medium text-gray-600 mb-2 block">Tax Certificate</label>
@@ -525,7 +509,6 @@ const Approvals = () => {
                         </div>
                       )}
 
-                      {/* ID Document */}
                       {selectedApplication.idDocument && (
                         <div className="mb-4">
                           <label className="text-sm font-medium text-gray-600 mb-2 block">ID Verification</label>
@@ -547,7 +530,32 @@ const Approvals = () => {
                         </div>
                       )}
 
-                      {!selectedApplication.businessRegistration && !selectedApplication.taxCertificate && !selectedApplication.idDocument && (
+                      {/* ✅ Passport Photo Display */}
+                      {selectedApplication.passportPhoto && (
+                        <div className="mb-4">
+                          <label className="text-sm font-medium text-gray-600 mb-2 block">Passport Photo</label>
+                          <img
+                            src={selectedApplication.passportPhoto}
+                            alt="Passport Photo"
+                            className="w-full h-48 object-cover rounded-lg border border-gray-200"
+                            onError={(e) => {
+                              e.target.style.display = 'none';
+                              e.target.nextSibling.style.display = 'flex';
+                            }}
+                          />
+                          <div className="hidden w-full h-48 bg-gray-100 rounded-lg border border-gray-200 items-center justify-center">
+                            <div className="text-center">
+                              <FileText className="w-8 h-8 text-gray-400 mx-auto mb-2" />
+                              <p className="text-sm text-gray-500">Document unavailable</p>
+                            </div>
+                          </div>
+                        </div>
+                      )}
+
+                      {!selectedApplication.businessRegistration && 
+                       !selectedApplication.taxCertificate && 
+                       !selectedApplication.idDocument && 
+                       !selectedApplication.passportPhoto && (
                         <div className="text-center py-8">
                           <Image className="w-12 h-12 text-gray-300 mx-auto mb-2" />
                           <p className="text-gray-500">No documents uploaded</p>
@@ -584,7 +592,6 @@ const Approvals = () => {
                   </div>
                 </div>
 
-                {/* Action Buttons */}
                 {selectedApplication.status?.toLowerCase() === 'pending' && (
                   <div className="flex gap-4 mt-8 pt-6 border-t border-gray-200">
                     <button
