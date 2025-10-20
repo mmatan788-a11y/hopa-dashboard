@@ -180,7 +180,7 @@ const AddProducts = () => {
   const [categories, setCategories] = useState([]);
   const [promotionPlans, setPromotionPlans] = useState([]);
   const [selectedPromotion, setSelectedPromotion] = useState('free');
-  const [selectedDuration, setSelectedDuration] = useState(7); // Default to 1 week
+  const [selectedDuration, setSelectedDuration] = useState(7);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -189,49 +189,48 @@ const AddProducts = () => {
   const [paymentData, setPaymentData] = useState(null);
   const [paymentReference, setPaymentReference] = useState(null);
   const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+  const [paymentWindowOpened, setPaymentWindowOpened] = useState(false);
 
-  // Fetch categories and promotion plans on component mount
+  // Fetch categories and promotion plans
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('accessToken');
         if (!token) return;
-        // Fetch categories
         const categoriesResponse = await axios.get(
           'https://hope-server-rho1.onrender.com/api/v1/categories',
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          }
+          { headers: { 'Authorization': `Bearer ${token}` } }
         );
         setCategories(categoriesResponse.data.data.categories);
-        // Fetch promotion plans
+
         const promotionsResponse = await axios.get(
           'https://hope-server-rho1.onrender.com/api/v1/payments/promotion-plans',
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`
-            }
-          }
+          { headers: { 'Authorization': `Bearer ${token}` } }
         );
         setPromotionPlans(promotionsResponse.data.data.promotionPlans);
       } catch (err) {
         console.error('Error fetching data:', err);
-        toast.error('Failed to load categories and promotion plans', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        toast.error('Failed to load categories and promotion plans');
       }
     };
     fetchData();
   }, []);
 
-  // Check payment status periodically when payment is processing
+  // Auto-open payment window when paymentData is available
+  useEffect(() => {
+    if (paymentData && paymentStep === 'payment_processing' && !paymentWindowOpened) {
+      const paymentWin = window.open(paymentData.paymentUrl, '_blank');
+      if (paymentWin) {
+        setPaymentWindowOpened(true);
+      } else {
+        toast.warn('Popup blocked! Please allow popups to proceed with payment.', {
+          autoClose: 6000,
+        });
+      }
+    }
+  }, [paymentData, paymentStep, paymentWindowOpened]);
+
+  // Check payment status periodically
   useEffect(() => {
     let intervalId;
     if (paymentReference && paymentStep === 'payment_processing') {
@@ -241,40 +240,20 @@ const AddProducts = () => {
           const token = localStorage.getItem('accessToken');
           const response = await axios.get(
             `https://hope-server-rho1.onrender.com/api/v1/payments/check-status/${paymentReference}`,
-            {
-              headers: {
-                'Authorization': `Bearer ${token}`
-              }
-            }
+            { headers: { 'Authorization': `Bearer ${token}` } }
           );
           const status = response.data.status;
           if (status === 'success' || status === 'completed') {
             setPaymentStep('payment_success');
-            toast.success('Payment successful! Your product is now live with premium promotion.', {
-              position: "top-right",
-              autoClose: 4000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-            });
+            toast.success('Payment successful! Your product is now live with premium promotion.');
             clearInterval(intervalId);
-            // Navigate to products page after success
-            setTimeout(() => {
-              navigate('/vendordashboard/productsmanagement');
-            }, 3000);
+            setTimeout(() => navigate('/vendordashboard/productsmanagement'), 3000);
           } else if (status === 'failed' || status === 'cancelled') {
             setPaymentStep('form');
             setPaymentReference(null);
             setPaymentData(null);
-            toast.error('Payment failed or was cancelled. Please try again.', {
-              position: "top-right",
-              autoClose: 4000,
-              hideProgressBar: false,
-              closeOnClick: true,
-              pauseOnHover: true,
-              draggable: true,
-            });
+            setPaymentWindowOpened(false);
+            toast.error('Payment failed or was cancelled. Please try again.');
             clearInterval(intervalId);
           }
         } catch (err) {
@@ -283,189 +262,90 @@ const AddProducts = () => {
           setIsCheckingPayment(false);
         }
       };
-      // Check immediately, then every 3 seconds
       checkPaymentStatus();
       intervalId = setInterval(checkPaymentStatus, 3000);
     }
-    return () => {
-      if (intervalId) {
-        clearInterval(intervalId);
-      }
-    };
+    return () => clearInterval(intervalId);
   }, [paymentReference, paymentStep, navigate]);
 
   const onSubmit = async (data) => {
     // Validate images
     if (productImages.length === 0) {
-      toast.error('Please upload at least one product image', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error('Please upload at least one product image');
       return;
     }
     if (productImages.length > 5) {
-      toast.error('Maximum 5 images allowed', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error('Maximum 5 images allowed');
       return;
     }
-    // Check each image size
     for (const image of productImages) {
-      if (image.size > 10 * 1024 * 1024) { // 10MB
-        toast.error('Each image should be less than 10MB', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+      if (image.size > 10 * 1024 * 1024) {
+        toast.error('Each image should be less than 10MB');
         return;
       }
     }
     // Validate location fields
     if (!data.region) {
-      toast.error('Please select a region', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error('Please select a region');
       return;
     }
     if (!data.town) {
-      toast.error('Please select a town', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error('Please select a town');
       return;
     }
     if (!data.specificAddress) {
-      toast.error('Please enter a specific address', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error('Please enter a specific address');
       return;
     }
 
     setIsLoading(true);
     setError('');
-
     try {
       const token = localStorage.getItem('accessToken');
-      if (!token) {
-        throw new Error('Not authenticated');
-      }
+      if (!token) throw new Error('Not authenticated');
 
       const formData = new FormData();
-      // Append basic product data
       formData.append('name', data.productName);
       formData.append('price', data.price);
       formData.append('description', data.businessDescription);
       formData.append('categoryId', data.categoryId);
       formData.append('subcategory', data.subcategory);
       formData.append('condition', data.condition || 'new');
-      // Append location data
       formData.append('region', data.region);
       formData.append('town', data.town);
       formData.append('specificAddress', data.specificAddress);
-      // Append optional fields
-      if (data.discount && data.discount.trim() !== '') {
-        formData.append('discount', data.discount);
-      }
-      if (data.tags && data.tags.trim() !== '') {
-        formData.append('tags', data.tags);
-      }
-      // Append images
-      productImages.forEach((image, index) => {
-        formData.append('images', image);
-      });
+      if (data.discount?.trim()) formData.append('discount', data.discount);
+      if (data.tags?.trim()) formData.append('tags', data.tags);
+      productImages.forEach(image => formData.append('images', image));
 
       if (selectedPromotion === 'free') {
-        // Free plan: direct product creation
-        const response = await axios.post(
-          'https://hope-server-rho1.onrender.com/api/v1/products',
-          formData,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data',
-            }
-          }
-        );
-        toast.success('Product added successfully!', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
+        await axios.post('https://hope-server-rho1.onrender.com/api/v1/products', formData, {
+          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
         });
+        toast.success('Product added successfully!');
         resetForm();
-        setTimeout(() => {
-          navigate('/vendordashboard/productsmanagement');
-        }, 1500);
+        setTimeout(() => navigate('/vendordashboard/productsmanagement'), 1500);
       } else {
-        // Premium plan: send type + duration
         formData.append('promotionPlan[type]', selectedPromotion);
         formData.append('promotionPlan[duration]', selectedDuration.toString());
 
         const response = await axios.post(
           'https://hope-server-rho1.onrender.com/api/v1/payments/create-premium-payment',
           formData,
-          {
-            headers: {
-              'Authorization': `Bearer ${token}`,
-              'Content-Type': 'multipart/form-data',
-            }
-          }
+          { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
         );
 
         const responseData = response.data.data;
         setPaymentData(responseData);
         setPaymentReference(responseData.reference);
         setPaymentStep('payment_processing');
-        toast.info('Product created! Proceeding to payment...', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
-        window.open(responseData.paymentUrl, '_blank');
+        setPaymentWindowOpened(false); // Reset so useEffect can open it
+        toast.info('Redirecting to payment gateway...');
       }
     } catch (err) {
       console.error('Error submitting product:', err);
-      console.error('Response data:', err.response?.data);
       const errorMessage = err.response?.data?.message || 'Failed to add product. Please try again.';
-      toast.error(errorMessage, {
-        position: "top-right",
-        autoClose: 4000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error(errorMessage);
     } finally {
       setIsLoading(false);
     }
@@ -489,31 +369,18 @@ const AddProducts = () => {
     setPaymentStep('form');
     setPaymentData(null);
     setPaymentReference(null);
+    setPaymentWindowOpened(false);
   };
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
     if (productImages.length + files.length > 5) {
-      toast.error('Maximum 5 images allowed', {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-      });
+      toast.error('Maximum 5 images allowed');
       return;
     }
     for (const file of files) {
       if (file.size > 10 * 1024 * 1024) {
-        toast.error('Each image should be less than 10MB', {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-        });
+        toast.error('Each image should be less than 10MB');
         return;
       }
     }
@@ -523,14 +390,7 @@ const AddProducts = () => {
 
   const removeImage = (index) => {
     setProductImages(productImages.filter((_, i) => i !== index));
-    toast.info('Image removed', {
-      position: "top-right",
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-    });
+    toast.info('Image removed');
   };
 
   const handleRegionChange = (e) => {
@@ -542,12 +402,10 @@ const AddProducts = () => {
   const selectedCategoryId = watch('categoryId');
   const selectedCategory = categories.find(cat => cat._id === selectedCategoryId);
   const subcategories = selectedCategory?.subcategories || [];
-
   const selectedRegion = watch('region');
   const selectedLocationData = GHANA_LOCATIONS.find(loc => loc.region === selectedRegion);
   const availableTowns = selectedLocationData?.towns || [];
 
-  // Get price for selected plan and duration
   const getPlanPrice = (type, duration) => {
     const priceMap = {
       basic: { 7: 25, 14: 40, 30: 60 },
@@ -557,16 +415,17 @@ const AddProducts = () => {
     return priceMap[type]?.[duration] || 0;
   };
 
-  // Render different steps based on payment flow
+  // === PAYMENT PROCESSING UI ===
   if (paymentStep === 'payment_processing') {
     return (
       <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
         <div className="text-center py-12">
           <CreditCard className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-4">Payment Processing</h2>
+          <h2 className="text-2xl font-bold mb-4">Processing Payment</h2>
           <p className="text-gray-600 mb-6">
-            Your product has been created and is waiting for payment confirmation.
+            Your product is created. Completing payment in a new tab...
           </p>
+
           {paymentData && (
             <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 max-w-md mx-auto">
               <h3 className="font-semibold mb-3">Payment Details</h3>
@@ -582,11 +441,12 @@ const AddProducts = () => {
               </div>
             </div>
           )}
+
           <div className="flex items-center justify-center space-x-2 mb-6">
             {isCheckingPayment ? (
               <>
                 <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-                <span className="text-sm text-gray-600">Checking payment status...</span>
+                <span className="text-sm text-gray-600">Verifying payment...</span>
               </>
             ) : (
               <>
@@ -595,29 +455,35 @@ const AddProducts = () => {
               </>
             )}
           </div>
-          {paymentData && (
-            <div className="space-y-3">
-              <p className="text-sm text-gray-600">
-                Complete your payment in the new window/tab that opened.
-              </p>
-              <button
-                onClick={() => window.open(paymentData.paymentUrl, '_blank')}
-                className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
-              >
-                Open Payment Page Again
-              </button>
-            </div>
-          )}
+
+          {/* Fallback button if popup was blocked */}
+          <div className="space-y-3">
+            <p className="text-sm text-gray-600">
+              If the payment page didn’t open, please click below:
+            </p>
+            <button
+              onClick={() => {
+                const win = window.open(paymentData.paymentUrl, '_blank');
+                if (win) setPaymentWindowOpened(true);
+                else toast.warn('Please allow popups in your browser.');
+              }}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
+            >
+              Open Payment Page
+            </button>
+          </div>
+
           <div className="mt-8 pt-6 border-t border-gray-200">
             <button
               onClick={() => {
                 setPaymentStep('form');
                 setPaymentReference(null);
                 setPaymentData(null);
+                setPaymentWindowOpened(false);
               }}
               className="text-gray-600 hover:text-gray-800 transition-colors"
             >
-              Back to Form
+              Cancel & Return to Form
             </button>
           </div>
         </div>
@@ -642,7 +508,7 @@ const AddProducts = () => {
             >
               View My Products
             </button>
-            <p className="text-sm text-gray-500">Redirecting automatically in a few seconds...</p>
+            <p className="text-sm text-gray-500">Redirecting automatically...</p>
           </div>
         </div>
         <ToastContainer />
@@ -650,14 +516,12 @@ const AddProducts = () => {
     );
   }
 
+  // === MAIN FORM ===
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6">Product Management</h1>
-      {error && (
-        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
-          {error}
-        </div>
-      )}
+      {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>}
+      
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Description Section */}
         <section className="mb-8">
@@ -945,7 +809,6 @@ const AddProducts = () => {
                 <span className="block text-sm text-gray-500">Standard visibility for your product</span>
               </span>
             </label>
-
             {promotionPlans.map(plan => (
               <div key={plan.type} className="border rounded-lg p-3">
                 <label className="flex items-center space-x-3 cursor-pointer">
@@ -955,7 +818,7 @@ const AddProducts = () => {
                     checked={selectedPromotion === plan.type}
                     onChange={() => {
                       setSelectedPromotion(plan.type);
-                      setSelectedDuration(7); // Reset duration when plan changes
+                      setSelectedDuration(7);
                     }}
                   />
                   <span className="flex-1">
@@ -963,7 +826,6 @@ const AddProducts = () => {
                     <span className="block text-sm text-gray-500">{plan.description}</span>
                   </span>
                 </label>
-
                 {selectedPromotion === plan.type && (
                   <div className="mt-3 ml-8 space-y-2">
                     <p className="text-sm font-medium text-gray-700">Select Duration:</p>
@@ -998,7 +860,7 @@ const AddProducts = () => {
         <div className="flex justify-between pt-4 border-t border-gray-200">
           <button
             type="button"
-            className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+            className="px-6 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
             onClick={() => navigate('/vendordashboard/productsmanagement')}
           >
             Cancel
@@ -1006,7 +868,7 @@ const AddProducts = () => {
           <button
             type="submit"
             disabled={isLoading}
-            className={`px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors ${
+            className={`px-6 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 ${
               isLoading ? 'opacity-70 cursor-not-allowed' : ''
             }`}
           >
