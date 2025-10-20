@@ -677,7 +677,7 @@ const AddProducts = () => {
             )}
           </div>
           <div className="mb-4">
-            <label className="block text-sm font-medium text-gray-700 mb-1">product Description*</label>
+            <label className="block text-sm font-medium text-gray-700 mb-1">Product Description*</label>
             <textarea
               className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 ${
                 errors.businessDescription ? 'border-red-500' : 'border-gray-300'
