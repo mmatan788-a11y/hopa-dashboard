@@ -469,10 +469,10 @@ const Approvals = () => {
                       
                       {selectedApplication.businessRegistration && (
                         <div className="mb-4">
-                          <label className="text-sm font-medium text-gray-600 mb-2 block">Business License</label>
+                          <label className="text-sm font-medium text-gray-600 mb-2 block">Passport Photo</label>
                           <img
                             src={selectedApplication.businessRegistration}
-                            alt="Business License"
+                            alt="Passport Photo"
                             className="w-full h-48 object-cover rounded-lg border border-gray-200"
                             onError={(e) => {
                               e.target.style.display = 'none';
@@ -533,10 +533,10 @@ const Approvals = () => {
                       {/* ✅ Passport Photo Display */}
                       {selectedApplication.passportPhoto && (
                         <div className="mb-4">
-                          <label className="text-sm font-medium text-gray-600 mb-2 block">Passport Photo</label>
+                          <label className="text-sm font-medium text-gray-600 mb-2 block">Business License</label>
                           <img
                             src={selectedApplication.passportPhoto}
-                            alt="Passport Photo"
+                            alt="Business License"
                             className="w-full h-48 object-cover rounded-lg border border-gray-200"
                             onError={(e) => {
                               e.target.style.display = 'none';
