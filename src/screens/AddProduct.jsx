@@ -1,13 +1,12 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { ChevronDown, Plus, Trash2, Upload, CreditCard, CheckCircle, AlertCircle } from 'lucide-react';
+import { Upload, CreditCard, CheckCircle, AlertCircle, Trash2,ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import axios from 'axios';
 
-// Ghana regions and towns data (same as provided)
 const GHANA_LOCATIONS = [
   {
     region: "Greater Accra",
@@ -170,12 +169,13 @@ const GHANA_LOCATIONS = [
     ]
   }
 ];
+
 const AddProducts = () => {
-  const { user, fetchUserProfile } = useAuth();
-  const { register, handleSubmit, control, setValue, watch, formState: { errors } } = useForm();
+  const { user } = useAuth();
+  const { register, handleSubmit, setValue, watch, formState: { errors } } = useForm();
   const navigate = useNavigate();
+
   const [productImages, setProductImages] = useState([]);
-  const [selectedSellingType, setSelectedSellingType] = useState('both');
   const [categories, setCategories] = useState([]);
   const [promotionPlans, setPromotionPlans] = useState([]);
   const [selectedPromotion, setSelectedPromotion] = useState('free');
@@ -183,109 +183,78 @@ const AddProducts = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  // Payment flow states
-  const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'payment_processing', 'payment_success'
-  const [paymentData, setPaymentData] = useState(null);
+  // Payment states
+  const [paymentStep, setPaymentStep] = useState('form'); // 'form', 'awaiting_payment', 'payment_success'
   const [paymentReference, setPaymentReference] = useState(null);
-  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
-  const [hasRedirected, setHasRedirected] = useState(false);
+  const [isVerifying, setIsVerifying] = useState(false);
+  const [paymentUrl, setPaymentUrl] = useState(null);
 
-  // Fetch categories and promotion plans
+  // Fetch categories & plans
   useEffect(() => {
     const fetchData = async () => {
       try {
         const token = localStorage.getItem('accessToken');
         if (!token) return;
-        const categoriesResponse = await axios.get(
-          'https://hope-server-rho1.onrender.com/api/v1/categories',
-          { headers: { 'Authorization': `Bearer ${token}` } }
-        );
-        setCategories(categoriesResponse.data.data.categories);
-
-        const promotionsResponse = await axios.get(
-          'https://hope-server-rho1.onrender.com/api/v1/payments/promotion-plans',
-          { headers: { 'Authorization': `Bearer ${token}` } }
-        );
-        setPromotionPlans(promotionsResponse.data.data.promotionPlans);
+        const [catRes, promoRes] = await Promise.all([
+          axios.get('https://hope-server-rho1.onrender.com/api/v1/categories', {
+            headers: { Authorization: `Bearer ${token}` }
+          }),
+          axios.get('https://hope-server-rho1.onrender.com/api/v1/payments/promotion-plans', {
+            headers: { Authorization: `Bearer ${token}` }
+          })
+        ]);
+        setCategories(catRes.data.data.categories);
+        setPromotionPlans(promoRes.data.data.promotionPlans);
       } catch (err) {
-        console.error('Error fetching data:', err);
-        toast.error('Failed to load categories and promotion plans');
+        console.error('Fetch error:', err);
+        toast.error('Failed to load data');
       }
     };
     fetchData();
   }, []);
 
-  // Auto-redirect to payment URL when in payment_processing step
-  useEffect(() => {
-    if (paymentStep === 'payment_processing' && paymentData && !hasRedirected) {
-      setHasRedirected(true);
-      // Redirect immediately to payment gateway
-      window.location.href = paymentData.paymentUrl;
-    }
-  }, [paymentStep, paymentData, hasRedirected]);
-
-  // Check payment status periodically (when user returns manually or via callback)
+  // Poll payment status when in 'awaiting_payment'
   useEffect(() => {
     let intervalId;
-    if (paymentReference && paymentStep === 'payment_processing') {
-      const checkPaymentStatus = async () => {
+    if (paymentStep === 'awaiting_payment' && paymentReference) {
+      const verifyPayment = async () => {
         try {
-          setIsCheckingPayment(true);
+          setIsVerifying(true);
           const token = localStorage.getItem('accessToken');
-          const response = await axios.get(
+          const res = await axios.get(
             `https://hope-server-rho1.onrender.com/api/v1/payments/check-status/${paymentReference}`,
-            { headers: { 'Authorization': `Bearer ${token}` } }
+            { headers: { Authorization: `Bearer ${token}` } }
           );
-          const status = response.data.status;
+          const status = res.data.status;
           if (status === 'success' || status === 'completed') {
             setPaymentStep('payment_success');
-            toast.success('Payment successful! Your product is now live with premium promotion.');
-            clearInterval(intervalId);
+            toast.success('✅ Payment confirmed! Your product is now live.');
             setTimeout(() => navigate('/vendordashboard/productsmanagement'), 3000);
-          } else if (status === 'failed' || status === 'cancelled') {
-            setPaymentStep('form');
-            setPaymentReference(null);
-            setPaymentData(null);
-            setHasRedirected(false);
-            toast.error('Payment failed or was cancelled. Please try again.');
-            clearInterval(intervalId);
           }
         } catch (err) {
-          console.error('Error checking payment status:', err);
+          console.error('Verification error:', err);
         } finally {
-          setIsCheckingPayment(false);
+          setIsVerifying(false);
         }
       };
-      checkPaymentStatus();
-      intervalId = setInterval(checkPaymentStatus, 3000);
+      verifyPayment();
+      intervalId = setInterval(verifyPayment, 4000); // check every 4s
     }
     return () => clearInterval(intervalId);
-  }, [paymentReference, paymentStep, navigate]);
+  }, [paymentStep, paymentReference, navigate]);
 
   const onSubmit = async (data) => {
-    // Validate images
-    if (productImages.length === 0) {
-      toast.error('Please upload at least one product image');
-      return;
+    // Validation (same as before)
+    if (productImages.length === 0) return toast.error('Upload at least one image');
+    if (productImages.length > 5) return toast.error('Max 5 images');
+    for (const img of productImages) {
+      if (img.size > 10 * 1024 * 1024) return toast.error('Image too large (>10MB)');
     }
-    if (productImages.length > 5) {
-      toast.error('Maximum 5 images allowed');
-      return;
-    }
-    for (const image of productImages) {
-      if (image.size > 10 * 1024 * 1024) {
-        toast.error('Each image should be less than 10MB');
-        return;
-      }
-    }
-    // Validate location
     if (!data.region || !data.town || !data.specificAddress) {
-      toast.error('Please complete all location fields');
-      return;
+      return toast.error('Complete all location fields');
     }
 
     setIsLoading(true);
-    setError('');
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error('Not authenticated');
@@ -302,37 +271,34 @@ const AddProducts = () => {
       formData.append('specificAddress', data.specificAddress);
       if (data.discount?.trim()) formData.append('discount', data.discount);
       if (data.tags?.trim()) formData.append('tags', data.tags);
-      productImages.forEach(image => formData.append('images', image));
+      productImages.forEach(img => formData.append('images', img));
 
       if (selectedPromotion === 'free') {
         await axios.post('https://hope-server-rho1.onrender.com/api/v1/products', formData, {
-          headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
+          headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
         });
-        toast.success('Product added successfully!');
-        resetForm();
+        toast.success('Product added!');
         setTimeout(() => navigate('/vendordashboard/productsmanagement'), 1500);
       } else {
         formData.append('promotionPlan[type]', selectedPromotion);
         formData.append('promotionPlan[duration]', selectedDuration.toString());
 
-        const response = await axios.post(
+        const res = await axios.post(
           'https://hope-server-rho1.onrender.com/api/v1/payments/create-premium-payment',
           formData,
-          { headers: { 'Authorization': `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
+          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
         );
 
-        const responseData = response.data.data;
-        setPaymentData(responseData);
-        setPaymentReference(responseData.reference);
-        setPaymentStep('payment_processing');
-        setHasRedirected(false);
-        toast.info('Redirecting to secure payment page...');
-        // Redirect will be handled by useEffect
+        const { paymentUrl, reference } = res.data.data;
+        setPaymentUrl(paymentUrl);
+        setPaymentReference(reference);
+        setPaymentStep('awaiting_payment');
+        toast.info('✅ Payment link generated. Please complete payment in the new tab.');
       }
     } catch (err) {
-      console.error('Error submitting product:', err);
-      const errorMessage = err.response?.data?.message || 'Failed to add product. Please try again.';
-      toast.error(errorMessage);
+      console.error('Submit error:', err);
+      const msg = err.response?.data?.message || 'Failed to submit product';
+      toast.error(msg);
     } finally {
       setIsLoading(false);
     }
@@ -345,44 +311,35 @@ const AddProducts = () => {
     setValue('businessDescription', '');
     setValue('categoryId', '');
     setValue('subcategory', '');
-    setValue('quantity', '');
-    setValue('discount', '');
-    setValue('tags', '');
+    setValue('condition', '');
     setValue('region', '');
     setValue('town', '');
     setValue('specificAddress', '');
+    setValue('discount', '');
+    setValue('tags', '');
     setSelectedPromotion('free');
     setSelectedDuration(7);
     setPaymentStep('form');
-    setPaymentData(null);
     setPaymentReference(null);
-    setHasRedirected(false);
+    setPaymentUrl(null);
   };
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    if (productImages.length + files.length > 5) {
-      toast.error('Maximum 5 images allowed');
-      return;
+    if (productImages.length + files.length > 5) return toast.error('Max 5 images');
+    for (const f of files) {
+      if (f.size > 10 * 1024 * 1024) return toast.error('Each image < 10MB');
     }
-    for (const file of files) {
-      if (file.size > 10 * 1024 * 1024) {
-        toast.error('Each image should be less than 10MB');
-        return;
-      }
-    }
-    setProductImages([...productImages, ...files]);
-    setError('');
+    setProductImages(prev => [...prev, ...files]);
   };
 
   const removeImage = (index) => {
-    setProductImages(productImages.filter((_, i) => i !== index));
-    toast.info('Image removed');
+    setProductImages(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleRegionChange = (e) => {
-    const selectedRegion = e.target.value;
-    setValue('region', selectedRegion);
+    const region = e.target.value;
+    setValue('region', region);
     setValue('town', '');
   };
 
@@ -390,71 +347,88 @@ const AddProducts = () => {
   const selectedCategory = categories.find(cat => cat._id === selectedCategoryId);
   const subcategories = selectedCategory?.subcategories || [];
   const selectedRegion = watch('region');
-  const selectedLocationData = GHANA_LOCATIONS.find(loc => loc.region === selectedRegion);
-  const availableTowns = selectedLocationData?.towns || [];
+  const locationData = GHANA_LOCATIONS.find(loc => loc.region === selectedRegion);
+  const availableTowns = locationData?.towns || [];
 
   const getPlanPrice = (type, duration) => {
-    const priceMap = {
+    const map = {
       basic: { 7: 25, 14: 40, 30: 60 },
       premium: { 7: 40, 14: 50, 30: 80 },
       ultra: { 7: 50, 14: 70, 30: 120 }
     };
-    return priceMap[type]?.[duration] || 0;
+    return map[type]?.[duration] || 0;
   };
 
-  // === PAYMENT PROCESSING UI (shows briefly before redirect) ===
-  if (paymentStep === 'payment_processing') {
+  // === AWAITING PAYMENT SCREEN ===
+  if (paymentStep === 'awaiting_payment') {
     return (
-      <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-        <div className="text-center py-12">
+      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
+        <div className="text-center py-8">
           <CreditCard className="h-16 w-16 text-blue-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-4">Redirecting to Payment</h2>
+          <h2 className="text-2xl font-bold mb-4">Complete Your Payment</h2>
           <p className="text-gray-600 mb-6">
-            Please wait while we take you to the secure payment page...
+            Please click on the button to complete payment
           </p>
 
-          {paymentData && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-6 max-w-md mx-auto">
-              <h3 className="font-semibold mb-3">Payment Details</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex justify-between">
-                  <span>Amount:</span>
-                  <span className="font-medium">GH₵{paymentData.amount}</span>
-                </div>
-                <div className="flex justify-between">
-                  <span>Reference:</span>
-                  <span className="font-medium text-xs">{paymentData.reference}</span>
-                </div>
-              </div>
-            </div>
-          )}
-
-          <div className="flex items-center justify-center space-x-2 mb-6">
-            <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-blue-600"></div>
-            <span className="text-sm text-gray-600">Redirecting...</span>
-          </div>
-
-          {/* Fallback button in case redirect fails */}
-          {paymentData && (
+          {paymentUrl && (
             <button
-              onClick={() => (window.location.href = paymentData.paymentUrl)}
-              className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md transition-colors"
+              onClick={() => window.open(paymentUrl, '_blank', 'noopener,noreferrer')}
+              className="inline-flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-md transition-colors mb-6"
             >
-              Complete Payment Now
+              <ExternalLink className="h-4 w-4" />
+              Open Payment Page 
             </button>
           )}
+
+          <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+            <p className="text-sm text-blue-800">
+              ⏳ We're automatically checking your payment status every few seconds.
+              Once confirmed, your product will be listed immediately.
+            </p>
+          </div>
+
+          <button
+            onClick={async () => {
+              setIsVerifying(true);
+              try {
+                const token = localStorage.getItem('accessToken');
+                const res = await axios.get(
+                  `https://hope-server-rho1.onrender.com/api/v1/payments/check-status/${paymentReference}`,
+                  { headers: { Authorization: `Bearer ${token}` } }
+                );
+                if (res.data.status === 'success' || res.data.status === 'completed') {
+                  setPaymentStep('payment_success');
+                  toast.success('Payment confirmed! Redirecting...');
+                  setTimeout(() => navigate('/vendordashboard/productsmanagement'), 1500);
+                } else {
+                  toast.info('Payment not yet completed. Please finish in the other tab.');
+                }
+              } catch (err) {
+                toast.error('Failed to verify payment. Please try again.');
+              } finally {
+                setIsVerifying(false);
+              }
+            }}
+            disabled={isVerifying}
+            className={`px-5 py-2.5 rounded-md ${
+              isVerifying
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                : 'bg-green-600 hover:bg-green-700 text-white'
+            }`}
+          >
+            {isVerifying ? 'Verifying...' : '✅ I Completed Payment – Verify Now'}
+          </button>
 
           <div className="mt-8 pt-6 border-t border-gray-200">
             <button
               onClick={() => {
                 setPaymentStep('form');
                 setPaymentReference(null);
-                setPaymentData(null);
-                setHasRedirected(false);
+                setPaymentUrl(null);
               }}
-              className="text-gray-600 hover:text-gray-800 transition-colors"
+              className="text-gray-600 hover:text-gray-800"
             >
-              Cancel & Return to Form
+              ← Back to Form
             </button>
           </div>
         </div>
@@ -465,22 +439,20 @@ const AddProducts = () => {
 
   if (paymentStep === 'payment_success') {
     return (
-      <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
+      <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
         <div className="text-center py-12">
           <CheckCircle className="h-16 w-16 text-green-600 mx-auto mb-4" />
-          <h2 className="text-2xl font-bold mb-4">Payment Successful!</h2>
+          <h2 className="text-2xl font-bold mb-2">Payment Successful!</h2>
           <p className="text-gray-600 mb-6">
-            Your product is now live with premium promotion features.
+            Your product is now live with premium promotion.
           </p>
-          <div className="space-y-3">
-            <button
-              onClick={() => navigate('/vendordashboard/productsmanagement')}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded-md transition-colors"
-            >
-              View My Products
-            </button>
-            <p className="text-sm text-gray-500">Redirecting automatically...</p>
-          </div>
+          <button
+            onClick={() => navigate('/vendordashboard/productsmanagement')}
+            className="bg-green-600 hover:bg-green-700 text-white px-6 py-2.5 rounded-md"
+          >
+            View My Products
+          </button>
+          <p className="text-sm text-gray-500 mt-4">Redirecting automatically...</p>
         </div>
         <ToastContainer />
       </div>
@@ -490,10 +462,12 @@ const AddProducts = () => {
   // === MAIN FORM ===
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
-      <h1 className="text-2xl font-bold mb-6">Product Management</h1>
-      {error && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{error}</div>}
+      <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
       
       <form onSubmit={handleSubmit(onSubmit)}>
+        {/* ... (all your form sections: Description, Location, Category, Images, Pricing, Promotion) ... */}
+        {/* Keep exactly as in your original code — no changes needed here */}
+
         {/* Description Section */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Description</h2>
