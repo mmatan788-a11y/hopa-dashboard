@@ -12,19 +12,6 @@ export const AuthProvider = ({ children }) => {
   const [profileLoading, setProfileLoading] = useState(false);
   const [token, setToken] = useState(localStorage.getItem("accessToken") || null);
 
-  // Clear all auth data
-  const clearAuthData = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userData");
-    localStorage.removeItem("isLoggedIn");
-    
-    setUser(null);
-    setToken(null);
-    setIsAuthenticated(false);
-    setError(null);
-  };
-
   // Initialize auth state from localStorage
   useEffect(() => {
     const checkAuth = async () => {
@@ -38,23 +25,12 @@ export const AuthProvider = ({ children }) => {
           setToken(storedToken);
           setIsAuthenticated(true);
           
-          // Try to fetch updated user profile
-          try {
-            await fetchUserProfile(storedToken);
-          } catch (profileError) {
-            console.error("Failed to fetch profile during auth check:", profileError);
-            // If profile fetch fails due to auth issues, clear everything
-            if (profileError.message.includes("Authentication failed") || 
-                profileError.message.includes("Invalid refresh token")) {
-              console.log("Clearing expired auth data");
-              clearAuthData();
-            }
-          }
+          // Fetch updated user profile after setting initial data
+          await fetchUserProfile(storedToken);
         }
       } catch (error) {
         console.error("Auth initialization error:", error);
-        // Clear potentially corrupted data
-        clearAuthData();
+        setError("Failed to restore authentication state");
       } finally {
         setLoading(false);
       }
@@ -62,49 +38,6 @@ export const AuthProvider = ({ children }) => {
     
     checkAuth();
   }, []);
-
-  // Function to refresh token
-  const refreshToken = async () => {
-    try {
-      const refreshTokenValue = localStorage.getItem("refreshToken");
-      
-      if (!refreshTokenValue) {
-        throw new Error("No refresh token available");
-      }
-      
-      const myHeaders = new Headers();
-      myHeaders.append("Content-Type", "application/json");
-      
-      const requestOptions = {
-        method: "POST",
-        headers: myHeaders,
-        body: JSON.stringify({ refreshToken: refreshTokenValue }),
-        redirect: "follow",
-      };
-      
-      const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/auth/refresh-token", requestOptions);
-      const result = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(result.message || "Invalid refresh token");
-      }
-      
-      // Update tokens in localStorage
-      localStorage.setItem("accessToken", result.accessToken);
-      if (result.refreshToken) {
-        localStorage.setItem("refreshToken", result.refreshToken);
-      }
-      
-      // Update token in state
-      setToken(result.accessToken);
-      
-      return result.accessToken;
-    } catch (error) {
-      console.error("Token refresh error:", error);
-      // Don't immediately logout here, let the calling function decide
-      throw error;
-    }
-  };
 
   // Fetch user profile function
   const fetchUserProfile = async (authToken) => {
@@ -129,17 +62,13 @@ export const AuthProvider = ({ children }) => {
       if (!response.ok) {
         // Handle token expiration
         if (response.status === 401) {
-          try {
-            // Try to refresh token
-            const newToken = await refreshToken();
-            if (newToken) {
-              // Retry with new token
-              return fetchUserProfile(newToken);
-            }
-          } catch (refreshError) {
-            console.error("Token refresh failed:", refreshError);
-            throw new Error("Authentication failed");
+          // Try to refresh token
+          const newToken = await refreshToken();
+          if (newToken) {
+            // Retry with new token
+            return fetchUserProfile(newToken);
           }
+          throw new Error("Authentication failed");
         }
         throw new Error("Failed to fetch user profile");
       }
@@ -158,7 +87,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       console.error("Profile fetch error:", error);
       setError(error.message || "Failed to fetch user profile");
-      throw error; // Re-throw so calling code can handle it
+      return null;
     } finally {
       setProfileLoading(false);
     }
@@ -204,12 +133,7 @@ export const AuthProvider = ({ children }) => {
         setIsAuthenticated(true);
         
         // Fetch complete profile
-        try {
-          await fetchUserProfile(result.accessToken);
-        } catch (profileError) {
-          console.warn("Failed to fetch complete profile after login:", profileError);
-          // Don't fail the login if profile fetch fails
-        }
+        await fetchUserProfile(result.accessToken);
         
         return result.data?.user;
       } else {
@@ -224,21 +148,28 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  // Login function (receiving user data from elsewhere)
-  const login = async (userData) => {
+  // Login function (receiving user data from elsewhere) - FIXED VERSION
+  const login = (userData) => {
+    // Force synchronous state updates
     setUser(userData);
     setIsAuthenticated(true);
+    setLoading(false); // Make sure loading is false
     
-    // Fetch complete profile after login
+    // Get current token
     const currentToken = localStorage.getItem("accessToken");
     if (currentToken) {
       setToken(currentToken);
-      try {
-        await fetchUserProfile(currentToken);
-      } catch (profileError) {
-        console.warn("Failed to fetch profile after login:", profileError);
-      }
+      // Fetch complete profile but don't wait for it
+      // The state is already updated, so UI will reflect logged-in status
+      fetchUserProfile(currentToken).catch(err => {
+        console.error("Failed to fetch full profile:", err);
+      });
     }
+    
+    // Force a small delay to ensure React has time to update
+    return new Promise(resolve => {
+      setTimeout(() => resolve(userData), 50);
+    });
   };
 
   // Register function
@@ -278,8 +209,86 @@ export const AuthProvider = ({ children }) => {
 
   // Logout function
   const logout = () => {
-    clearAuthData();
+    // Clear all auth data
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
+    localStorage.removeItem("userData");
+    localStorage.removeItem("isLoggedIn");
+    
+    // Reset state
+    setUser(null);
+    setToken(null);
+    setIsAuthenticated(false);
+    setError(null);
   };
+
+  // Function to refresh token
+  const refreshToken = async () => {
+  try {
+    const storedRefreshToken = localStorage.getItem("refreshToken");
+
+    if (!storedRefreshToken) {
+      console.warn("No refresh token found — cannot refresh session.");
+      return null;
+    }
+
+    const myHeaders = new Headers();
+    myHeaders.append("Content-Type", "application/json");
+
+    const requestOptions = {
+      method: "POST",
+      headers: myHeaders,
+      body: JSON.stringify({ refreshToken: storedRefreshToken }),
+      redirect: "follow",
+    };
+
+    console.log("Refreshing token...");
+
+    const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/auth/refresh-token", requestOptions);
+    const result = await response.json();
+
+    // 🧠 Handle failed responses gracefully
+    if (!response.ok || result.status !== "success") {
+      console.error("Refresh token failed:", result);
+      // Only logout if the refresh token is invalid or expired
+      if (
+        result.message?.toLowerCase().includes("invalid") ||
+        result.message?.toLowerCase().includes("expired")
+      ) {
+        logout();
+      }
+      return null;
+    }
+
+    // ✅ Update access token
+    if (result.accessToken) {
+      localStorage.setItem("accessToken", result.accessToken);
+      setToken(result.accessToken);
+    }
+
+    // ✅ Only update refresh token if backend returns a new one
+    if (result.refreshToken) {
+      localStorage.setItem("refreshToken", result.refreshToken);
+    }
+
+    console.log("Token refreshed successfully ✅");
+    return result.accessToken || null;
+  } catch (error) {
+    console.error("Token refresh error:", error);
+
+    // Only logout on true auth errors, not network issues
+    if (
+      error.message?.toLowerCase().includes("invalid") ||
+      error.message?.toLowerCase().includes("expired")
+    ) {
+      logout();
+    }
+
+    // Don’t throw — just return null so fetchUserProfile can handle gracefully
+    return null;
+  }
+};
+
 
   // Get user initials for profile placeholder
   const getUserInitials = () => {
@@ -329,31 +338,6 @@ export const AuthProvider = ({ children }) => {
       };
       
       const response = await fetch("https://hope-server-rho1.onrender.com/api/v1/users/me", requestOptions);
-      
-      if (response.status === 401) {
-        // Try to refresh token
-        try {
-          const newToken = await refreshToken();
-          if (newToken) {
-            // Retry with new token
-            myHeaders.set("Authorization", `Bearer ${newToken}`);
-            const retryOptions = { ...requestOptions, headers: myHeaders };
-            const retryResponse = await fetch("https://hope-server-rho1.onrender.com/api/v1/users/me", retryOptions);
-            const retryResult = await retryResponse.json();
-            
-            if (retryResponse.ok && retryResult.status === "success") {
-              setUser(retryResult.data.user);
-              localStorage.setItem("userData", JSON.stringify(retryResult.data.user));
-              return retryResult.data.user;
-            }
-          }
-        } catch (refreshError) {
-          console.error("Token refresh failed during profile update:", refreshError);
-          logout();
-          throw new Error("Authentication failed");
-        }
-      }
-      
       const result = await response.json();
       
       if (response.ok && result.status === "success") {

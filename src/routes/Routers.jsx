@@ -16,6 +16,7 @@ import AddPromo from "../screens/AddPromo";
 import Approvals from "../screens/Approvals";
 import ProductsRenewal from "../screens/ProductRenewal";
 import ProductsManagement from "../screens/ProductManagement";
+import ProductDetails from "../components/ProductDetails";
 
 
 // Protected Route Component
@@ -203,6 +204,14 @@ const Routers = () => {
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
               <ProductsManagement />
+            </ProtectedRoute>
+          } 
+        />
+         <Route 
+          path="/product/:id" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProductDetails />
             </ProtectedRoute>
           } 
         />

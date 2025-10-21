@@ -125,7 +125,14 @@ const ProductsRenewal = () => {
     }
   };
 
-  const handleProductClick = (product) => {
+ const handleProductClick = (product, event) => {
+    // Prevent navigation if clicking on buttons or interactive elements
+    if (event && (
+      event.target.closest('button') || 
+      event.target.closest('a')
+    )) {
+      return;
+    }
     navigate(`/product/${product._id}`);
   };
 

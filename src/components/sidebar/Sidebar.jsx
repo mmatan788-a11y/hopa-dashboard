@@ -217,7 +217,7 @@ const Sidebar = ({ onToggle, onLogout }) => {
           <SidebarItem
             to="/productsmanagement"
             icon={PackageSearch}
-            text="Admin Products Management"
+            text="Products Management"
             isOpen={isOpen}
             setActiveHover={setActiveHover}
             activeHover={activeHover}
@@ -359,7 +359,7 @@ const Sidebar = ({ onToggle, onLogout }) => {
           <SidebarItem
             to="/productsmanagement"
             icon={PackageSearch}
-            text="Admin Products Management"
+            text="Products Management"
             isOpen={true}
             setActiveHover={setActiveHover}
             activeHover={activeHover}
