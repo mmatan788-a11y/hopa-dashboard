@@ -16,12 +16,15 @@ import {
   Boxes,
   Gem,
   PackageSearch,
+  Menu,
+  X,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Sidebar = ({ onToggle, onLogout }) => {
   const [isOpen, setIsOpen] = useState(true);
   const [activeHover, setActiveHover] = useState(null);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   const toggleSidebar = () => {
     const newState = !isOpen;
@@ -31,6 +34,10 @@ const Sidebar = ({ onToggle, onLogout }) => {
     if (onToggle) {
       onToggle(newState);
     }
+  };
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
   };
 
   // Handle logout
@@ -46,6 +53,18 @@ const Sidebar = ({ onToggle, onLogout }) => {
       onToggle(isOpen);
     }
   }, []);
+
+  // Close mobile menu when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isMobileMenuOpen && !event.target.closest('.sidebar-mobile')) {
+        setIsMobileMenuOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [isMobileMenuOpen]);
 
   const sidebarVariants = {
     open: {
@@ -66,158 +85,327 @@ const Sidebar = ({ onToggle, onLogout }) => {
     },
   };
 
+  const mobileMenuVariants = {
+    open: {
+      x: 0,
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      },
+    },
+    closed: {
+      x: "-100%",
+      transition: {
+        type: "spring",
+        stiffness: 300,
+        damping: 30,
+      },
+    },
+  };
+
   return (
-    <motion.div
-      initial="open"
-      animate={isOpen ? "open" : "closed"}
-      variants={sidebarVariants}
-      className="h-screen bg-white shadow-lg flex flex-col p-5 relative"
-    >
-      {/* Toggle Button */}
-      <motion.div
-        className="absolute -right-3 top-12 bg-[#DD761C] rounded-full p-1 cursor-pointer shadow-md z-10"
-        whileHover={{ scale: 1.1 }}
-        whileTap={{ scale: 0.95 }}
-        onClick={toggleSidebar}
+    <>
+      {/* Mobile Menu Button - Only visible on mobile */}
+      <button
+        onClick={toggleMobileMenu}
+        className="fixed top-4 left-4 z-50 lg:hidden bg-[#DD761C] text-white p-2 rounded-lg shadow-lg"
       >
-        {isOpen ? (
-          <ChevronLeft className="text-white h-5 w-5" />
-        ) : (
-          <ChevronRight className="text-white h-5 w-5" />
+        {isMobileMenuOpen ? <X size={24} /> : <Menu size={24} />}
+      </button>
+
+      {/* Overlay for mobile */}
+      <AnimatePresence>
+        {isMobileMenuOpen && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black bg-opacity-50 z-40 lg:hidden"
+            onClick={() => setIsMobileMenuOpen(false)}
+          />
         )}
-      </motion.div>
+      </AnimatePresence>
 
-      {/* Logo with animation */}
+      {/* Desktop Sidebar - Hidden on mobile */}
       <motion.div
-        className="flex justify-center items-center mb-8"
-        initial={{ y: -20, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ delay: 0.2, duration: 0.5 }}
-      ></motion.div>
-
-      {/* Navigation */}
-      <nav className="flex flex-col space-y-2">
-        <SidebarItem
-          to="/overview"
-          icon={House}
-          text="Overview"
-          isOpen={isOpen}
-          setActiveHover={setActiveHover}
-          activeHover={activeHover}
-          id="overview"
-        />
-        <SidebarItem
-          to="/analytics"
-          icon={ChartNoAxesCombined}
-          text="Analytics"
-          isOpen={isOpen}
-          setActiveHover={setActiveHover}
-          activeHover={activeHover}
-          id="analytics"
-        />
-        <SidebarItem
-          to="/orders"
-          icon={Tag}
-          text="Orders"
-          isOpen={isOpen}
-          setActiveHover={setActiveHover}
-          activeHover={activeHover}
-          id="orders"
-        />
-        <SidebarItem
-          to="/customermanagement"
-          icon={User}
-          text="Customer "
-          isOpen={isOpen}
-          setActiveHover={setActiveHover}
-          activeHover={activeHover}
-          id="customers"
-        />
-          <SidebarItem
-          to="/approvals"
-          icon={User}
-          text="Approvals "
-          isOpen={isOpen}
-          setActiveHover={setActiveHover}
-          activeHover={activeHover}
-          id="approvals"
-        />
-        <SidebarItem
-          to="/products"
-          icon={ShoppingBasket}
-          text="Products "
-          isOpen={isOpen}
-          setActiveHover={setActiveHover}
-          activeHover={activeHover}
-          id="products"
-        />
-         <SidebarItem
-          to="/productsmanagement"
-          icon={PackageSearch}
-          text="Admin Products Management"
-          isOpen={isOpen}
-          setActiveHover={setActiveHover}
-          activeHover={activeHover}
-          id="productsmanagement"
-        />
-        <SidebarItem
-          to="/categories"
-          icon={Boxes}
-          text="Categories "
-          isOpen={isOpen}
-          setActiveHover={setActiveHover}
-          activeHover={activeHover}
-          id="categories"
-        />
-        <SidebarItem
-          to="/promo"
-          icon={Gem}
-          text="Promotions "
-          isOpen={isOpen}
-          setActiveHover={setActiveHover}
-          activeHover={activeHover}
-          id="promo"
-        />
-        {/* <SidebarItem
-          to="/financialreport"
-          icon={Landmark}
-          text="Financial Report"
-          isOpen={isOpen}
-          setActiveHover={setActiveHover}
-          activeHover={activeHover}
-          id="settings"
-        /> */}
-      </nav>
-
-      {/* Divider with animation */}
-      <motion.div
-        className="mt-auto mb-4 border-t border-gray-200"
-        initial={{ scaleX: 0 }}
-        animate={{ scaleX: 1 }}
-        transition={{ duration: 0.5 }}
-      />
-
-      {/* Footer with version */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: isOpen ? 1 : 0 }}
-        transition={{ duration: 0.3 }}
-        className="mb-4 text-center text-xs text-gray-400"
+        initial="open"
+        animate={isOpen ? "open" : "closed"}
+        variants={sidebarVariants}
+        className="hidden lg:flex h-screen bg-white shadow-lg flex-col p-5 relative"
       >
-        {isOpen && "v1.0.2"}
+        {/* Toggle Button */}
+        <motion.div
+          className="absolute -right-3 top-12 bg-[#DD761C] rounded-full p-1 cursor-pointer shadow-md z-10"
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.95 }}
+          onClick={toggleSidebar}
+        >
+          {isOpen ? (
+            <ChevronLeft className="text-white h-5 w-5" />
+          ) : (
+            <ChevronRight className="text-white h-5 w-5" />
+          )}
+        </motion.div>
+
+        {/* Logo with animation */}
+        <motion.div
+          className="flex justify-center items-center mb-8"
+          initial={{ y: -20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ delay: 0.2, duration: 0.5 }}
+        >
+          {/* Add your logo here */}
+        </motion.div>
+
+        {/* Navigation */}
+        <nav className="flex flex-col space-y-2 flex-1 overflow-y-auto pr-2">
+          <SidebarItem
+            to="/overview"
+            icon={House}
+            text="Overview"
+            isOpen={isOpen}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="overview"
+          />
+          <SidebarItem
+            to="/analytics"
+            icon={ChartNoAxesCombined}
+            text="Analytics"
+            isOpen={isOpen}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="analytics"
+          />
+          <SidebarItem
+            to="/orders"
+            icon={Tag}
+            text="Orders"
+            isOpen={isOpen}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="orders"
+          />
+          <SidebarItem
+            to="/customermanagement"
+            icon={User}
+            text="Customer"
+            isOpen={isOpen}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="customers"
+          />
+          <SidebarItem
+            to="/approvals"
+            icon={User}
+            text="Approvals"
+            isOpen={isOpen}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="approvals"
+          />
+          <SidebarItem
+            to="/products"
+            icon={ShoppingBasket}
+            text="Products"
+            isOpen={isOpen}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="products"
+          />
+          <SidebarItem
+            to="/productsmanagement"
+            icon={PackageSearch}
+            text="Admin Products Management"
+            isOpen={isOpen}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="productsmanagement"
+          />
+          <SidebarItem
+            to="/categories"
+            icon={Boxes}
+            text="Categories"
+            isOpen={isOpen}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="categories"
+          />
+          <SidebarItem
+            to="/promo"
+            icon={Gem}
+            text="Promotions"
+            isOpen={isOpen}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="promo"
+          />
+        </nav>
+
+        {/* Spacer to push logout up */}
+        <div className="mt-auto pt-4">
+          {/* Divider with animation */}
+          <motion.div
+            className="mb-4 border-t border-gray-200"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 0.5 }}
+          />
+
+          {/* Footer with version */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isOpen ? 1 : 0 }}
+            transition={{ duration: 0.3 }}
+            className="mb-3 text-center text-xs text-gray-400"
+          >
+            {isOpen && "v1.0.2"}
+          </motion.div>
+
+          {/* Logout */}
+          <LogoutButton
+            icon={LogOut}
+            text="Logout"
+            isOpen={isOpen}
+            onLogout={handleLogout}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="logout"
+          />
+        </div>
       </motion.div>
 
-      {/* Logout - Modified to use button instead of NavLink */}
-      <LogoutButton
-        icon={LogOut}
-        text="Logout"
-        isOpen={isOpen}
-        onLogout={handleLogout}
-        setActiveHover={setActiveHover}
-        activeHover={activeHover}
-        id="logout"
-      />
-    </motion.div>
+      {/* Mobile Sidebar */}
+      <motion.div
+        initial="closed"
+        animate={isMobileMenuOpen ? "open" : "closed"}
+        variants={mobileMenuVariants}
+        className="sidebar-mobile fixed top-0 left-0 h-screen w-72 bg-white shadow-2xl z-50 lg:hidden flex flex-col"
+      >
+        {/* Mobile Header */}
+        <div className="flex items-center justify-between p-5 border-b border-gray-200">
+          <h2 className="text-lg font-bold text-gray-800">Menu</h2>
+          <button
+            onClick={toggleMobileMenu}
+            className="text-gray-600 hover:text-gray-900"
+          >
+            <X size={24} />
+          </button>
+        </div>
+
+        {/* Mobile Navigation */}
+        <nav className="flex flex-col space-y-2 p-5 flex-1 overflow-y-auto">
+          <SidebarItem
+            to="/overview"
+            icon={House}
+            text="Overview"
+            isOpen={true}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="overview"
+            onMobileClick={() => setIsMobileMenuOpen(false)}
+          />
+          <SidebarItem
+            to="/analytics"
+            icon={ChartNoAxesCombined}
+            text="Analytics"
+            isOpen={true}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="analytics"
+            onMobileClick={() => setIsMobileMenuOpen(false)}
+          />
+          <SidebarItem
+            to="/orders"
+            icon={Tag}
+            text="Orders"
+            isOpen={true}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="orders"
+            onMobileClick={() => setIsMobileMenuOpen(false)}
+          />
+          <SidebarItem
+            to="/customermanagement"
+            icon={User}
+            text="Customer"
+            isOpen={true}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="customers"
+            onMobileClick={() => setIsMobileMenuOpen(false)}
+          />
+          <SidebarItem
+            to="/approvals"
+            icon={User}
+            text="Approvals"
+            isOpen={true}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="approvals"
+            onMobileClick={() => setIsMobileMenuOpen(false)}
+          />
+          <SidebarItem
+            to="/products"
+            icon={ShoppingBasket}
+            text="Products"
+            isOpen={true}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="products"
+            onMobileClick={() => setIsMobileMenuOpen(false)}
+          />
+          <SidebarItem
+            to="/productsmanagement"
+            icon={PackageSearch}
+            text="Admin Products Management"
+            isOpen={true}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="productsmanagement"
+            onMobileClick={() => setIsMobileMenuOpen(false)}
+          />
+          <SidebarItem
+            to="/categories"
+            icon={Boxes}
+            text="Categories"
+            isOpen={true}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="categories"
+            onMobileClick={() => setIsMobileMenuOpen(false)}
+          />
+          <SidebarItem
+            to="/promo"
+            icon={Gem}
+            text="Promotions"
+            isOpen={true}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="promo"
+            onMobileClick={() => setIsMobileMenuOpen(false)}
+          />
+        </nav>
+
+        {/* Mobile Footer */}
+        <div className="p-5 border-t border-gray-200">
+          <div className="mb-3 text-center text-xs text-gray-400">v1.0.2</div>
+          <LogoutButton
+            icon={LogOut}
+            text="Logout"
+            isOpen={true}
+            onLogout={() => {
+              handleLogout();
+              setIsMobileMenuOpen(false);
+            }}
+            setActiveHover={setActiveHover}
+            activeHover={activeHover}
+            id="logout"
+          />
+        </div>
+      </motion.div>
+    </>
   );
 };
 
@@ -230,13 +418,14 @@ const SidebarItem = ({
   setActiveHover,
   activeHover,
   id,
+  onMobileClick,
 }) => {
   const [showTooltip, setShowTooltip] = useState(false);
 
   const itemVariants = {
     active: {
       backgroundColor: "rgba(221, 118, 28, 0.2)",
-      color: "rgb(221, 118, 28)", 
+      color: "rgb(221, 118, 28)",
       x: 0,
       transition: {
         type: "spring",
@@ -262,6 +451,7 @@ const SidebarItem = ({
       <NavLink
         to={to}
         className="block"
+        onClick={onMobileClick}
         onMouseEnter={() => {
           setActiveHover(id);
           if (!isOpen) setShowTooltip(true);
@@ -295,7 +485,7 @@ const SidebarItem = ({
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
                   transition={{ duration: 0.2 }}
-                  className="ml-3 font-medium"
+                  className="ml-3 font-medium whitespace-nowrap overflow-hidden"
                 >
                   {text}
                 </motion.span>
@@ -388,7 +578,7 @@ const LogoutButton = ({
                 animate={{ opacity: 1, width: "auto" }}
                 exit={{ opacity: 0, width: 0 }}
                 transition={{ duration: 0.2 }}
-                className="ml-3 font-medium"
+                className="ml-3 font-medium whitespace-nowrap overflow-hidden"
               >
                 {text}
               </motion.span>
