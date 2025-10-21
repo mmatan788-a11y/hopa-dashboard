@@ -14,6 +14,8 @@ import AddProduct from "../screens/AddProduct";
 import AddCategory from "../screens/AddCategory";
 import AddPromo from "../screens/AddPromo";
 import Approvals from "../screens/Approvals";
+import ProductsRenewal from "../screens/ProductRenewal";
+import ProductsManagement from "../screens/ProductManagement";
 
 
 // Protected Route Component
@@ -189,6 +191,22 @@ const Routers = () => {
           } 
         />
         <Route 
+          path="/vendordashboard/products-renewal" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProductsRenewal />
+            </ProtectedRoute>
+          } 
+        />
+          <Route 
+          path="/productsmanagement" 
+          element={
+            <ProtectedRoute isAuthenticated={isAuthenticated}>
+              <ProductsManagement />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
           path="/add-promo" 
           element={
             <ProtectedRoute isAuthenticated={isAuthenticated}>
@@ -197,6 +215,8 @@ const Routers = () => {
           } 
         />
       </Route>
+
+      
     </Routes>
   );
 };

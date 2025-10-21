@@ -15,6 +15,7 @@ import {
   ShoppingBasket,
   Boxes,
   Gem,
+  PackageSearch,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -149,6 +150,15 @@ const Sidebar = ({ onToggle, onLogout }) => {
           setActiveHover={setActiveHover}
           activeHover={activeHover}
           id="products"
+        />
+         <SidebarItem
+          to="/productsmanagement"
+          icon={PackageSearch}
+          text="Admin Products Management"
+          isOpen={isOpen}
+          setActiveHover={setActiveHover}
+          activeHover={activeHover}
+          id="productsmanagement"
         />
         <SidebarItem
           to="/categories"
