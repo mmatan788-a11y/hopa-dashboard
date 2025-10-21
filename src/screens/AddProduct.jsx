@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
-import { Upload, CreditCard, CheckCircle, AlertCircle, Trash2,ExternalLink } from 'lucide-react';
+import { Upload, CreditCard, CheckCircle, AlertCircle, Trash2, ExternalLink } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
@@ -213,48 +213,76 @@ const AddProducts = () => {
     fetchData();
   }, []);
 
-  // Poll payment status when in 'awaiting_payment'
+  // Poll payment status when in 'awaiting_payment' - FIXED VERSION
   useEffect(() => {
     let intervalId;
-    if (paymentStep === 'awaiting_payment' && paymentReference) {
-      const verifyPayment = async () => {
-        try {
-          setIsVerifying(true);
-          const token = localStorage.getItem('accessToken');
-          const res = await axios.get(
-            `https://hope-server-rho1.onrender.com/api/v1/payments/check-status/${paymentReference}`,
-            { headers: { Authorization: `Bearer ${token}` } }
-          );
-          const status = res.data.status;
-          if (status === 'success' || status === 'completed') {
-            setPaymentStep('payment_success');
-            toast.success('✅ Payment confirmed! Your product is now live.');
-            setTimeout(() => navigate('/vendordashboard/productsmanagement'), 3000);
-          }
-        } catch (err) {
-          console.error('Verification error:', err);
-        } finally {
-          setIsVerifying(false);
+    
+    const verifyPayment = async () => {
+      if (paymentStep !== 'awaiting_payment' || !paymentReference) return;
+      
+      try {
+        setIsVerifying(true);
+        const token = localStorage.getItem('accessToken');
+        const res = await axios.get(
+          `https://hope-server-rho1.onrender.com/api/v1/payments/check-status/${paymentReference}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        );
+        
+        console.log('Payment status response:', res.data);
+        
+        const status = res.data.status;
+        if (status === 'success' || status === 'completed') {
+          // Clear interval immediately when success is detected
+          clearInterval(intervalId);
+          setPaymentStep('payment_success');
+          toast.success('✅ Payment confirmed! Your product is now live.');
+          setTimeout(() => navigate('/vendordashboard/productsmanagement'), 3000);
         }
-      };
+      } catch (err) {
+        console.error('Verification error:', err);
+        // Don't stop polling on errors, just log them
+      } finally {
+        setIsVerifying(false);
+      }
+    };
+
+    if (paymentStep === 'awaiting_payment' && paymentReference) {
+      // Verify immediately and then set up interval
       verifyPayment();
       intervalId = setInterval(verifyPayment, 4000); // check every 4s
     }
-    return () => clearInterval(intervalId);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
   }, [paymentStep, paymentReference, navigate]);
 
   const onSubmit = async (data) => {
-    // Validation (same as before)
-    if (productImages.length === 0) return toast.error('Upload at least one image');
-    if (productImages.length > 5) return toast.error('Max 5 images');
+    // Validation
+    if (productImages.length === 0) {
+      toast.error('Upload at least one image');
+      return;
+    }
+    if (productImages.length > 5) {
+      toast.error('Max 5 images');
+      return;
+    }
     for (const img of productImages) {
-      if (img.size > 10 * 1024 * 1024) return toast.error('Image too large (>10MB)');
+      if (img.size > 10 * 1024 * 1024) {
+        toast.error('Image too large (>10MB)');
+        return;
+      }
     }
     if (!data.region || !data.town || !data.specificAddress) {
-      return toast.error('Complete all location fields');
+      toast.error('Complete all location fields');
+      return;
     }
 
     setIsLoading(true);
+    setError('');
+    
     try {
       const token = localStorage.getItem('accessToken');
       if (!token) throw new Error('Not authenticated');
@@ -286,18 +314,29 @@ const AddProducts = () => {
         const res = await axios.post(
           'https://hope-server-rho1.onrender.com/api/v1/payments/create-premium-payment',
           formData,
-          { headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' } }
+          { 
+            headers: { 
+              Authorization: `Bearer ${token}`, 
+              'Content-Type': 'multipart/form-data' 
+            },
+            timeout: 30000 // 30 second timeout
+          }
         );
 
-        const { paymentUrl, reference } = res.data.data;
+        const { paymentUrl, reference, externalRef } = res.data.data;
         setPaymentUrl(paymentUrl);
         setPaymentReference(reference);
         setPaymentStep('awaiting_payment');
+        
+        // Store externalRef in localStorage for recovery
+        localStorage.setItem('lastPaymentRef', externalRef);
+        
         toast.info('✅ Payment link generated. Please complete payment in the new tab.');
       }
     } catch (err) {
       console.error('Submit error:', err);
       const msg = err.response?.data?.message || 'Failed to submit product';
+      setError(msg);
       toast.error(msg);
     } finally {
       setIsLoading(false);
@@ -326,9 +365,15 @@ const AddProducts = () => {
 
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files);
-    if (productImages.length + files.length > 5) return toast.error('Max 5 images');
+    if (productImages.length + files.length > 5) {
+      toast.error('Max 5 images');
+      return;
+    }
     for (const f of files) {
-      if (f.size > 10 * 1024 * 1024) return toast.error('Each image < 10MB');
+      if (f.size > 10 * 1024 * 1024) {
+        toast.error('Each image < 10MB');
+        return;
+      }
     }
     setProductImages(prev => [...prev, ...files]);
   };
@@ -464,10 +509,16 @@ const AddProducts = () => {
     <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-2xl font-bold mb-6">Add New Product</h1>
       
+      {error && (
+        <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-md">
+          <div className="flex items-center">
+            <AlertCircle className="h-5 w-5 text-red-500 mr-2" />
+            <span className="text-red-700">{error}</span>
+          </div>
+        </div>
+      )}
+      
       <form onSubmit={handleSubmit(onSubmit)}>
-        {/* ... (all your form sections: Description, Location, Category, Images, Pricing, Promotion) ... */}
-        {/* Keep exactly as in your original code — no changes needed here */}
-
         {/* Description Section */}
         <section className="mb-8">
           <h2 className="text-xl font-semibold mb-4">Description</h2>
