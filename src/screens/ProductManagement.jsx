@@ -618,12 +618,7 @@ const ProductsManagement = () => {
                 Manage Renewals
               </button>
             </Link>
-            <Link to="/vendordashboard/add-products">
-              <button className="flex items-center bg-blue-600 text-white rounded-lg px-4 py-2 hover:bg-blue-700 transition-colors text-sm">
-                <Plus className="h-4 w-4 mr-2" />
-                Add Product
-              </button>
-            </Link>
+           
           </div>
         </div>
 

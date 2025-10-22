@@ -306,7 +306,7 @@ const AddProducts = () => {
           headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'multipart/form-data' }
         });
         toast.success('Product added!');
-        setTimeout(() => navigate('/vendordashboard/productsmanagement'), 1500);
+        setTimeout(() => navigate('/products'), 1500);
       } else {
         formData.append('promotionPlan[type]', selectedPromotion);
         formData.append('promotionPlan[duration]', selectedDuration.toString());
